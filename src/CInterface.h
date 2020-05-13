@@ -1,0 +1,31 @@
+/*
+ * @author Hong Son Ngo <ngohongs@fit.cvut.cz>
+ * @date 13/05/2020.
+ */
+
+#pragma once
+
+#include <iostream>
+#include <stdexcept>
+#include <string>
+#include <cstring>
+#include <limits>
+
+
+class CInterface {
+private:
+    std::ostream & m_Out;
+    std::istream & m_In;
+public:
+    explicit CInterface(std::ostream &out, std::istream &in);
+
+    void PromptMessage(std::string &message);
+
+    std::string PromptCommand() const;
+
+    bool Clear();
+
+};
+
+
+

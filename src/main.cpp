@@ -1,6 +1,7 @@
 #include <iostream>
+#include "CApplication.h"
+
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
+    return CApplication(CInterface(std::cout, std::cin)).Run();
 }
