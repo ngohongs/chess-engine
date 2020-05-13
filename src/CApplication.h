@@ -5,15 +5,21 @@
 
 #pragma once
 
-
+#include <iostream>
+#include <string>
+#include <memory>
+#include <map>
 #include "CInterface.h"
 #include "CGame.h"
+#include "CCommand.h"
+#include "CCommandHelp.h"
+#include "CCommandQuit.h"
 
 class CApplication {
 private:
-
+    std::map<std::string, std::unique_ptr<CCommand>> m_Commands;
     CInterface m_Interface;
-    CGame m_Game;
+    //CGame m_Game;
 public:
     explicit CApplication(const CInterface & interface);
 
@@ -24,22 +30,6 @@ public:
     CApplication & operator=(const CApplication &) = delete;
 
     int Run();
-
-    void ExecuteCommand(std::string &command);
-
-    void Play();
-
-    void Save() const;
-
-    void Load();
-
-    void Board() const;
-
-    void Move();
-
-    void Help() const;
-
-    void Quit();
 };
 
 

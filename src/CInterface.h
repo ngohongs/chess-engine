@@ -19,12 +19,12 @@ private:
 public:
     explicit CInterface(std::ostream &out, std::istream &in);
 
-    void PromptMessage(std::string &message);
+    void PromptMessage(const char * message);
+    void PromptMessage(const std::string & message);
 
     std::string PromptCommand() const;
 
     bool Clear();
-
 };
 
 
