@@ -15,10 +15,7 @@ class CCommandHelp : public CCommand {
 private:
     std::map<std::string, std::unique_ptr<CCommand>> &m_Commands;
 public:
-    explicit CCommandHelp(const CInterface &interface, const char * help, const std::map<std::string, std::unique_ptr<CCommand>> &commands);
+    explicit CCommandHelp(const CInterface &interface, const char * help, std::map<std::string, std::unique_ptr<CCommand>> &commands);
 
     bool Execute() override;
 };
-
-
-

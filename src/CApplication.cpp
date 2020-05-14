@@ -15,9 +15,11 @@ CApplication::CApplication(const CInterface &interface)
 
 int CApplication::Run() {
     while (true) {
-        std::string command = m_Interface.PromptCommand();
-
-
+        std::string command = m_Interface.PromptCommand([this] (const std::string & command) {
+            return m_Commands.find(command) != m_Commands.end();
+        });
+        if (!m_Commands[command]->Execute())
+            break;
     }
     return 0;
 }
