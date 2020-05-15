@@ -167,4 +167,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+build/
+ngohongs
 # End of https://www.gitignore.io/api/c++,macos,cmake,clion+all

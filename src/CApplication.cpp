@@ -20,6 +20,8 @@ int CApplication::Run() {
         });
         if (!m_Commands[command]->Execute())
             break;
+
+
     }
     return 0;
 }

@@ -5,9 +5,17 @@
 
 #pragma once
 
+#include "CBoard.h"
+
 
 class CGame {
+private:
+    bool m_Initialized = false;
+    CBoard m_Board;
+public:
+    bool Save() const;
 
+    bool Load();
 };
 
 

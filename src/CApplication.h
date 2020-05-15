@@ -12,14 +12,14 @@
 #include "CInterface.h"
 #include "CGame.h"
 #include "CCommand.h"
-#include "CCommandHelp.h"
-#include "CCommandQuit.h"
+#include "CCommands/CCommandHelp.h"
+#include "CCommands/CCommandQuit.h"
 
 class CApplication {
 private:
     std::map<std::string, std::unique_ptr<CCommand>> m_Commands;
     CInterface m_Interface;
-    //CGame m_Game;
+    CGame m_Game;
 public:
     explicit CApplication(const CInterface & interface);
 

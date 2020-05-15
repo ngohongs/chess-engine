@@ -8,14 +8,16 @@
 #include <map>
 #include <string>
 #include <memory>
-#include "CCommand.h"
+#include "../CCommand.h"
 
 
 class CCommandHelp : public CCommand {
 private:
     std::map<std::string, std::unique_ptr<CCommand>> &m_Commands;
 public:
-    explicit CCommandHelp(const CInterface &interface, const char * help, std::map<std::string, std::unique_ptr<CCommand>> &commands);
+    explicit CCommandHelp(const CInterface & interface, const char * help, std::map<std::string, std::unique_ptr<CCommand>> &commands);
+
+    ~CCommandHelp() override = default;
 
     bool Execute() override;
 };

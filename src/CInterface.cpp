@@ -22,10 +22,10 @@ std::string CInterface::PromptCommand(const std::function<bool (const std::strin
     std::string command;
     while (true) {
         m_In >> command;
-        if (m_In.fail())
-            throw std::runtime_error("Error during inputting command");
-        else if (m_In.eof())
+        if (m_In.eof())
             return "quit";
+        else if (m_In.fail())
+            throw std::runtime_error("Error during inputting command");
         else if (!valid(command)) {
             std::cout << "Non-existing command. Enter a valid command, for help enter the command 'help'" << std::endl;
             Clear();
