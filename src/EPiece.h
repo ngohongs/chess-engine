@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <iostream>
 
 enum class EPiece : char {
     KING = 'K',
@@ -14,3 +15,5 @@ enum class EPiece : char {
     KNIGHT = 'N',
     PAWN = 'P'
 };
+
+//std::ostream & operator<<()

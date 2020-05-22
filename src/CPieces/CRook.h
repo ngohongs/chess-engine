@@ -5,13 +5,16 @@
 
 #pragma once
 
+#include <iostream>
 #include "../CPiece.h"
 
 
 class CRook : public CPiece {
 private:
 public:
-    explicit CRook(CBoard * board, const CCoord & coord, EColor color);
+    explicit CRook(CBoard & board, const CCoord & coord, EColor color);
+
+    std::ostream & Print(std::ostream & os) const;
 };
 
 

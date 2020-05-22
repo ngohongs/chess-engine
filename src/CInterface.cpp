@@ -63,5 +63,9 @@ void CInterface::PromptMessage(const std::string &message) {
         throw std::runtime_error("Error during outputting message");
 }
 
+std::ostream & CInterface::GetOstream() const {
+    return m_Out;
+}
+
 
 

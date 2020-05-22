@@ -5,13 +5,14 @@
 
 #pragma once
 
+#include <iostream>
 #include <memory>
 #include <set>
 #include "CCoord.h"
 #include "EColor.h"
 #include "EPiece.h"
-#include "CBoard.h"
 
+class CBoard;
 
 class CPiece {
 protected:
@@ -19,21 +20,29 @@ protected:
     EPiece m_Piece;
     EColor m_Color;
     size_t m_LastTurn = 0;
-    CBoard * m_Board;
+    CBoard & m_Board;
 public:
-    explicit CPiece(CBoard * board, const CCoord & coord, EPiece piece, EColor color);
+    explicit CPiece(CBoard & board, const CCoord & coord, EPiece piece, EColor color);
 
     virtual ~CPiece() = default;
 
-//    virtual std::set<CCoord> MoveSet() const = 0;
-//
-//    bool Move(const CCoord & destination);
+//    virtual std::set<CCoord> Moveset() = 0;
 
-    CCoord & GetCoord() const;
+    virtual std::ostream & Print(std::ostream & os) const = 0;
 
-    EPiece GetName() const;
+    friend std::ostream & operator<<(std::ostream & os, const CPiece & self);
 
-    EColor GetColor() const;
+    const CCoord & GetCoord() const {
+        return m_Coord;
+    }
+
+    EPiece GetName() const {
+        return m_Piece;
+    }
+
+    EColor GetColor() const {
+        return m_Color;
+    }
 };
 
 

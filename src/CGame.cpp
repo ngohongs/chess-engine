@@ -4,3 +4,8 @@
  */
 
 #include "CGame.h"
+
+
+std::ostream & operator<<(std::ostream & os, const CGame & self) {
+    return self.m_Board.Print(os);
+}

@@ -8,5 +8,10 @@ add_executable(ngohongs src/main.cpp
                         src/CGame.cpp src/CGame.h
                         src/CInterface.cpp src/CInterface.cpp
                         src/CCommand.h
-        src/CCommands/CCommandHelp.cpp src/CCommands/CCommandHelp.h
-        src/CCommands/CCommandQuit.cpp src/CCommands/CCommandQuit.h src/CBoard.cpp src/CBoard.h src/CPiece.cpp src/CPiece.h src/EColor.h src/EPiece.h src/CCoord.h src/CPieces/CPawn.cpp src/CPieces/CPawn.h src/CPieces/CQueen.cpp src/CPieces/CQueen.h src/CPieces/CKing.cpp src/CPieces/CKing.h src/CPieces/CRook.cpp src/CPieces/CRook.h src/CPieces/CBishop.cpp src/CPieces/CBishop.h src/CPieces/CKnight.cpp src/CPieces/CKnight.h)
+                        src/CCommands/CCommandHelp.cpp src/CCommands/CCommandHelp.h
+                        src/CCommands/CCommandQuit.cpp src/CCommands/CCommandQuit.h
+                        src/CBoard.cpp src/CBoard.h
+                        src/CPiece.cpp src/CPiece.h
+                        src/EColor.h src/EPiece.h src/CCoord.h
+                        src/CPieces/CRook.cpp src/CPieces/CRook.h
+        src/CPieces/CKnight.cpp src/CPieces/CKnight.h src/CPieces/CBishop.cpp src/CPieces/CBishop.h src/CPieces/CQueen.cpp src/CPieces/CQueen.h src/CPieces/CKing.cpp src/CPieces/CKing.h src/CPieces/CPawn.cpp src/CPieces/CPawn.h src/CCommands/CCommandBoard.cpp src/CCommands/CCommandBoard.h)

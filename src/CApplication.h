@@ -14,6 +14,7 @@
 #include "CCommand.h"
 #include "CCommands/CCommandHelp.h"
 #include "CCommands/CCommandQuit.h"
+#include "CCommands/CCommandBoard.h"
 
 class CApplication {
 private:

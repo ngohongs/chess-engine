@@ -1,18 +1,20 @@
 /*
  * @author Hong Son Ngo <ngohongs@fit.cvut.cz>
- * @date 15/05/2020.
+ * @date 22/05/2020.
  */
 
 #pragma once
 
+#include <iostream>
 #include "../CPiece.h"
 
 
 class CPawn : public CPiece {
 private:
-    bool En_Passant = false;
 public:
-    explicit CPawn(CBoard * board, const CCoord & coord, EColor color);
+    explicit CPawn(CBoard & board, const CCoord & coord, EColor color);
+
+    std::ostream & Print(std::ostream & os) const;
 };
 
 

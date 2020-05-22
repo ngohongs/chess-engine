@@ -16,6 +16,8 @@ public:
     bool Save() const;
 
     bool Load();
+
+    friend std::ostream & operator<< (std::ostream & os, const CGame & self);
 };
 
 

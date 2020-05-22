@@ -22,6 +22,8 @@ public:
     void PromptMessage(const char * message);
     void PromptMessage(const std::string & message);
 
+    std::ostream & GetOstream() const;
+
     std::string PromptCommand(const std::function<bool (const std::string &)> &valid);
 
     void Clear();

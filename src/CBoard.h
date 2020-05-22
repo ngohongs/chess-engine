@@ -5,18 +5,28 @@
 
 #pragma once
 
+#include <iostream>
 #include <vector>
 #include <memory>
 #include "CPiece.h"
 #include "EColor.h"
+#include "CPieces/CKing.h"
+#include "CPieces/CQueen.h"
+#include "CPieces/CBishop.h"
+#include "CPieces/CKnight.h"
+#include "CPieces/CRook.h"
+#include "CPieces/CPawn.h"
+
+class CPiece;
 
 class CBoard {
 private:
-    std::vector<std::vector<std::unique_ptr<CPiece>>> m_Board;
+    using TBoard = std::vector<std::vector<std::unique_ptr<CPiece>>>;
+    TBoard m_Board;
 public:
     CBoard();
 
-    void Print() const;
+    std::ostream & Print(std::ostream & os) const;
 };
 
 
