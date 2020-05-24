@@ -7,10 +7,15 @@
 #include "../CBoard.h"
 
 
-CKnight::CKnight(CBoard & board, const CCoord & coord, EColor color)
+CKnight::CKnight(CBoard & board, int coord, EColor color)
 : CPiece(board, coord, EPiece::KNIGHT, color) {
 }
 
 std::ostream & CKnight::Print(std::ostream & os) const {
-    return os << (m_Color == EColor::WHITE ? "\u2658" : "\u265e");
+    return os << (m_Color == EColor::WHITE ? 'N' : 'n');
+    //return os << (m_Color == EColor::WHITE ? "\u2658" : "\u265e");
+}
+
+char CKnight::GetCode() const {
+    return m_Color == EColor::WHITE ? 'N' : 'n';
 }

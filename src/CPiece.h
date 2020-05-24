@@ -11,18 +11,20 @@
 #include "CCoord.h"
 #include "EColor.h"
 #include "EPiece.h"
+#include "ETile.h"
+
 
 class CBoard;
 
 class CPiece {
 protected:
-    CCoord m_Coord;
+    int m_Coord;
     EPiece m_Piece;
     EColor m_Color;
     size_t m_LastTurn = 0;
     CBoard & m_Board;
 public:
-    explicit CPiece(CBoard & board, const CCoord & coord, EPiece piece, EColor color);
+    explicit CPiece(CBoard & board, int coord, EPiece piece, EColor color);
 
     virtual ~CPiece() = default;
 
@@ -32,17 +34,19 @@ public:
 
     friend std::ostream & operator<<(std::ostream & os, const CPiece & self);
 
-    const CCoord & GetCoord() const {
+    int GetCoord() const {
         return m_Coord;
     }
 
-    EPiece GetName() const {
+    EPiece GetPiece() const {
         return m_Piece;
     }
 
     EColor GetColor() const {
         return m_Color;
     }
+
+    virtual char GetCode() const = 0;
 };
 
 

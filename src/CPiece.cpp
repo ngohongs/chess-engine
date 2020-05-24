@@ -10,7 +10,7 @@
 //: m_Coord(coord), m_Piece(piece), m_Color(color) {
 //}
 
-CPiece::CPiece(CBoard & board, const CCoord & coord, EPiece piece, EColor color)
+CPiece::CPiece(CBoard & board, int coord, EPiece piece, EColor color)
 : m_Board(board), m_Coord(coord), m_Piece(piece), m_Color(color) {
 }
 

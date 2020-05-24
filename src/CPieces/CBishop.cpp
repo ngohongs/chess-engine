@@ -7,11 +7,16 @@
 #include "../CBoard.h"
 
 
-CBishop::CBishop(CBoard & board, const CCoord & coord, EColor color)
+CBishop::CBishop(CBoard & board, int coord, EColor color)
 : CPiece(board, coord, EPiece::BISHOP, color) {
 }
 
 std::ostream & CBishop::Print(std::ostream & os) const {
-    return os << (m_Color == EColor::WHITE ? "\u2657" : "\u265d");
+    return os << (m_Color == EColor::WHITE ? 'B' : 'b');
+    //return os << (m_Color == EColor::WHITE ? "\u2657" : "\u265d");
+}
+
+char CBishop::GetCode() const {
+    return m_Color == EColor::WHITE ? 'B' : 'b';
 }
 

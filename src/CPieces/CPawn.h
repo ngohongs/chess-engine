@@ -12,9 +12,11 @@
 class CPawn : public CPiece {
 private:
 public:
-    explicit CPawn(CBoard & board, const CCoord & coord, EColor color);
+    explicit CPawn(CBoard & board, int coord, EColor color);
 
     std::ostream & Print(std::ostream & os) const;
+
+    char GetCode() const override;
 };
 
 

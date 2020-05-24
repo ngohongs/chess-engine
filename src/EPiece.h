@@ -13,7 +13,6 @@ enum class EPiece : char {
     ROOK = 'R',
     BISHOP = 'B',
     KNIGHT = 'N',
-    PAWN = 'P'
+    PAWN = 'P',
+    EMPTY = ' '
 };
-
-//std::ostream & operator<<()

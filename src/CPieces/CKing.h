@@ -12,9 +12,11 @@
 class CKing : public CPiece {
 private:
 public:
-    explicit CKing(CBoard & board, const CCoord & coord, EColor color);
+    explicit CKing(CBoard & board, int coord, EColor color);
 
     std::ostream & Print(std::ostream & os) const;
+
+    char GetCode() const override;
 };
 
 

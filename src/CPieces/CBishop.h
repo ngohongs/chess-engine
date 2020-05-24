@@ -12,10 +12,9 @@
 class CBishop : public CPiece {
 private:
 public:
-    explicit CBishop(CBoard & board, const CCoord & coord, EColor color);
+    explicit CBishop(CBoard & board, int coord, EColor color);
 
     std::ostream & Print(std::ostream & os) const override;
+
+    char GetCode() const override;
 };
-
-
-
