@@ -9,9 +9,11 @@
 #include <cassert>
 #include <string>
 #include <cstring>
+#include <map>
 #include <vector>
 #include <memory>
 #include <sstream>
+#include <random>
 #include "CPiece.h"
 #include "EColor.h"
 #include "CPieces/CKing.h"
@@ -36,6 +38,14 @@ private:
     int m_Turns = 1;
     int m_EnPassant = EMPTY;
     int m_WhiteTurn = true;
+
+    std::map<char,std::vector<uint64_t>> m_PieceKeys;
+    uint64_t m_CastlingKeys[16];
+    uint64_t m_EnPassantKey;
+    uint64_t m_WhiteTurnKey;
+
+    void GenerateHashKeys();
+    uint64_t GenerateUint64() const;
 public:
     CBoard();
 

@@ -8,6 +8,7 @@
 
 const char * const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
+const char PIECE_CODES[12] = {'p', 'n', 'b', 'r', 'q' ,'k', 'P', 'N', 'B', 'R', 'Q', 'K'};
 const unsigned int WHITE_KING_CASTLE = 0x8;
 const unsigned int WHITE_QUEEN_CASTLE = 0x4;
 const unsigned int BLACK_KING_CASTLE = 0x2;

@@ -8,6 +8,7 @@
 
 CBoard::CBoard() {
     m_Board.resize(120);
+    GenerateHashKeys();
     ReadFEN(START_FEN);
     assert(CreateFEN() == START_FEN);
 
@@ -41,7 +42,10 @@ CBoard::CBoard() {
     ReadFEN(FEN10);
     assert(CreateFEN() == FEN10);
 
-    PrintState();
+    for (uint64_t i : m_CastlingKeys)
+        std::cout << i << std::endl;
+    std::cout << m_WhiteTurnKey << std::endl;
+    std::cout << m_EnPassantKey << std::endl;
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
@@ -279,6 +283,22 @@ std::string CBoard::CreateFEN() const {
     fen.push_back(' ');
     fen += std::to_string(m_Turns);
     return fen;
+}
+
+void CBoard::GenerateHashKeys() {
+    std::random_device seed;
+    std::mt19937_64 gen(seed());
+    std::uniform_int_distribution<uint64_t> dist;
+
+    for (char i : PIECE_CODES)
+        m_PieceKeys[i];
+        for (int i = 0; i < 64; i++)
+            m_PieceKeys[i].push_back(dist(gen));
+    for (int i = 0; i < 16; i++)
+        m_CastlingKeys[i] = dist(gen);
+
+    m_EnPassantKey = dist(gen);
+    m_WhiteTurnKey = dist(gen);
 }
 
 
