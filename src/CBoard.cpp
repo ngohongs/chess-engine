@@ -13,7 +13,6 @@ CBoard::CBoard() {
     ReadFEN(START_FEN);
     assert(CreateFEN() == START_FEN);
     GenerateStateKey();
-    TilesAttackedBy(EColor::WHITE);
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
@@ -360,5 +359,3 @@ void CBoard::TilesAttackedBy(EColor attacker) const {
     std::cout << "  +-----------------+" << std::endl;
     std::cout << "    A B C D E F G H" << std::endl;
 }
-
-

@@ -24,9 +24,11 @@
 #include "CPieces/CPawn.h"
 #include "CPieces/CEmpty.h"
 #include "CPieces/COffboard.h"
+#include "CMove.h"
 #include "ETile.h"
 #include "EConst.h"
 #include "FENTest.h"
+
 
 class CPiece;
 

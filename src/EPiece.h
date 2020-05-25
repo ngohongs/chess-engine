@@ -17,3 +17,5 @@ enum class EPiece : char {
     EMPTY = '.',
     OFFBOARD = ' '
 };
+
+std::ostream & operator<< (std::ostream & os, const EPiece & self);
