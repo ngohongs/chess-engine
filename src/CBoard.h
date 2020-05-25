@@ -23,6 +23,7 @@
 #include "CPieces/CRook.h"
 #include "CPieces/CPawn.h"
 #include "CPieces/CEmpty.h"
+#include "CPieces/COffboard.h"
 #include "ETile.h"
 #include "EConst.h"
 #include "FENTest.h"
@@ -56,7 +57,11 @@ public:
 
     std::string CreateFEN() const;
 
+    bool TileAttacked(EColor attack, int tile) const;
+
     void PrintState() const;
+
+    void TilesAttackedBy(EColor attacker) const;
 };
 
 

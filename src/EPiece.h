@@ -14,5 +14,6 @@ enum class EPiece : char {
     BISHOP = 'B',
     KNIGHT = 'N',
     PAWN = 'P',
-    EMPTY = ' '
+    EMPTY = '.',
+    OFFBOARD = ' '
 };

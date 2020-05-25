@@ -5,13 +5,15 @@
 
 #include "CBoard.h"
 
-
 CBoard::CBoard() {
-    InitiateHashKeys();
+    for (int i = 0; i < 120; i++)
+        m_Board[i] = std::make_unique<COffboard>(COffboard(*this, i));
 
+    InitiateHashKeys();
     ReadFEN(START_FEN);
     assert(CreateFEN() == START_FEN);
     GenerateStateKey();
+    PrintState();
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
@@ -20,10 +22,7 @@ std::ostream & CBoard::Print(std::ostream & os) const {
     for (int i = 7; i >= 0; i--) {
         os << i + 1 << " | ";
         for (int j = A1; j <= H1; j++) {
-            if (m_Board[j + i * 10])
-                os << *m_Board[j + i * 10] << ' ';
-            else
-                os << ". ";
+            os << *m_Board[j + i * 10] << ' ';
         }
         os << "| " << i + 1 << std::endl;
     }
@@ -193,10 +192,7 @@ bool CBoard::ReadFEN(const std::string & fen) {
 void CBoard::PrintState() const {
     for (int i = 0; i < 12; i++) {
         for (int j = 0; j < 10; j++) {
-            if (!m_Board[i * 10 + j])
-                std::cout << '_';
-            else
-                m_Board[i * 10 + j]->Print(std::cout);
+            m_Board[i * 10 + j]->Print(std::cout);
         }
         std::cout << '\n';
     }
@@ -288,6 +284,81 @@ uint64_t CBoard::GenerateStateKey() {
 
     m_StateKey = stateKey;
     return stateKey;
+}
+
+bool CBoard::TileAttacked(EColor attacker, int tile) const {
+    // Pawn attacking
+    if (attacker == EColor::WHITE) {
+        if (m_Board[tile - 9]->GetCode() == P || m_Board[tile - 11]->GetCode() == P)
+            return true;
+    }
+    else {
+        if (m_Board[tile + 9]->GetCode() == p || m_Board[tile + 11]->GetCode() == p)
+            return true;
+    }
+
+    //Knight attacking
+    for (int i : KNIGHT_ATTACKS) {
+        if (m_Board[tile + i ]->GetPiece() == EPiece::KNIGHT && m_Board[tile + i ]->GetColor() == attacker)
+            return true;
+    }
+
+    int tempTile;
+    EPiece piece;
+    EColor color;
+    //Rook attacks with half of queen attacks
+    for (int i : ROOK_ATTACKS) {
+        tempTile = tile + i;
+        while (m_Board[tempTile]) {
+            piece = m_Board[tempTile]->GetPiece();
+            color = m_Board[tempTile]->GetColor();
+            if (piece != EPiece::EMPTY) {
+                if ((piece == EPiece::ROOK || piece == EPiece::QUEEN) && color == attacker)
+                    return true;
+                break;
+            }
+        tempTile += i;
+        }
+    }
+    //Bishop attacks with half of queen attacks
+    for (int i : BISHOP_ATTACKS) {
+        tempTile = tile + i;
+        while (m_Board[tempTile]) {
+            piece = m_Board[tempTile]->GetPiece();
+            color = m_Board[tempTile]->GetColor();
+            if (piece != EPiece::EMPTY) {
+                if ((piece == EPiece::ROOK || piece == EPiece::QUEEN) && color == attacker)
+                    return true;
+                break;
+            }
+            tempTile += i;
+        }
+    }
+
+    //King attacks
+    for (int i : KING_ATTACKS) {
+        if (m_Board[tile +  i]->GetPiece() == EPiece::KNIGHT && m_Board[tile + i]->GetColor() == attacker)
+            return true;
+    }
+
+    return false;
+}
+
+void CBoard::TilesAttackedBy(EColor attacker) const {
+    std::cout << "    A B C D E F G H" << std::endl;
+    std::cout << "  +-----------------+" << std::endl;
+    for (int i = 7; i >= 0; i--) {
+        std::cout << i + 1 << " | ";
+        for (int j = A1; j <= H1; j++) {
+            if (TileAttacked(attacker ,j + i * 10))
+                std::cout << "X ";
+            else
+                std::cout << ". ";
+        }
+        std::cout << "| " << i + 1 << std::endl;
+    }
+    std::cout << "  +-----------------+" << std::endl;
+    std::cout << "    A B C D E F G H" << std::endl;
 }
 
 

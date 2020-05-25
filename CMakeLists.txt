@@ -14,4 +14,4 @@ add_executable(ngohongs src/main.cpp
                         src/CPiece.cpp src/CPiece.h
                         src/EColor.h src/EPiece.h
         src/CPieces/CRook.cpp src/CPieces/CRook.h
-        src/CPieces/CKnight.cpp src/CPieces/CKnight.h src/CPieces/CBishop.cpp src/CPieces/CBishop.h src/CPieces/CQueen.cpp src/CPieces/CQueen.h src/CPieces/CKing.cpp src/CPieces/CKing.h src/CPieces/CPawn.cpp src/CPieces/CPawn.h src/CCommands/CCommandBoard.cpp src/CCommands/CCommandBoard.h src/ETile.h src/CPieces/CEmpty.cpp src/CPieces/CEmpty.h src/EConst.h src/ETile.cpp src/FENTest.h src/CMove.cpp src/CMove.h)
+        src/CPieces/CKnight.cpp src/CPieces/CKnight.h src/CPieces/CBishop.cpp src/CPieces/CBishop.h src/CPieces/CQueen.cpp src/CPieces/CQueen.h src/CPieces/CKing.cpp src/CPieces/CKing.h src/CPieces/CPawn.cpp src/CPieces/CPawn.h src/CCommands/CCommandBoard.cpp src/CCommands/CCommandBoard.h src/ETile.h src/CPieces/CEmpty.cpp src/CPieces/CEmpty.h src/EConst.h src/ETile.cpp src/FENTest.h src/CMove.cpp src/CMove.h src/CPieces/COffboard.cpp src/CPieces/COffboard.h)
