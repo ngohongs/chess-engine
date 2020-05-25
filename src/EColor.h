@@ -8,7 +8,8 @@
 
 enum class EColor : char {
     WHITE = 'W',
-    BLACK = 'B'
+    BLACK = 'B',
+    NONE = ' '
 };
 
 

@@ -15,6 +15,4 @@ public:
     explicit CBishop(CBoard & board, int coord, EColor color);
 
     std::ostream & Print(std::ostream & os) const override;
-
-    char GetCode() const override;
 };

@@ -15,8 +15,6 @@ public:
     explicit CPawn(CBoard & board, int coord, EColor color);
 
     std::ostream & Print(std::ostream & os) const;
-
-    char GetCode() const override;
 };
 
 

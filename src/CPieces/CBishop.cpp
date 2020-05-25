@@ -8,15 +8,10 @@
 
 
 CBishop::CBishop(CBoard & board, int coord, EColor color)
-: CPiece(board, coord, EPiece::BISHOP, color) {
+: CPiece(board, coord, EPiece::BISHOP, color, color == EColor::WHITE ? B : b) {
 }
 
 std::ostream & CBishop::Print(std::ostream & os) const {
     return os << (m_Color == EColor::WHITE ? 'B' : 'b');
     //return os << (m_Color == EColor::WHITE ? "\u2657" : "\u265d");
 }
-
-char CBishop::GetCode() const {
-    return m_Color == EColor::WHITE ? 'B' : 'b';
-}
-

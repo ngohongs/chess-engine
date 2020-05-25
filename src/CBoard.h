@@ -32,20 +32,21 @@ class CPiece;
 class CBoard {
 private:
     using TBoard = std::vector<std::unique_ptr<CPiece>>;
-    TBoard m_Board;
+    std::unique_ptr<CPiece> m_Board[120];
     unsigned int m_Castling = 0xF;
     int m_Plies = 0;
     int m_Turns = 1;
     int m_EnPassant = EMPTY;
     int m_WhiteTurn = true;
 
-    std::map<char,std::vector<uint64_t>> m_PieceKeys;
+    uint64_t m_PiecesKeys[12][120];
     uint64_t m_CastlingKeys[16];
-    uint64_t m_EnPassantKey;
+    uint64_t m_EnPassantKey[120];
     uint64_t m_WhiteTurnKey;
 
-    void GenerateHashKeys();
-    uint64_t GenerateUint64() const;
+    uint64_t m_StateKey;
+    void InitiateHashKeys();
+    uint64_t GenerateStateKey();
 public:
     CBoard();
 

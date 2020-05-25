@@ -13,8 +13,6 @@ public:
     CEmpty(CBoard & board, int coord);
 
     std::ostream & Print(std::ostream & os) const;
-
-    char GetCode() const override;
 };
 
 

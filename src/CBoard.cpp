@@ -7,45 +7,11 @@
 
 
 CBoard::CBoard() {
-    m_Board.resize(120);
-    GenerateHashKeys();
+    InitiateHashKeys();
+
     ReadFEN(START_FEN);
     assert(CreateFEN() == START_FEN);
-
-    ReadFEN(FEN1);
-    assert(CreateFEN() == FEN1);
-
-    ReadFEN(FEN2);
-    assert(CreateFEN() == FEN2);
-
-    ReadFEN(FEN3);
-    assert(CreateFEN() == FEN3);
-
-    ReadFEN(FEN4);
-    assert(CreateFEN() == FEN4);
-
-    ReadFEN(FEN5);
-    assert(CreateFEN() == FEN5);
-
-    ReadFEN(FEN6);
-    assert(CreateFEN() == FEN6);
-
-    ReadFEN(FEN7);
-    assert(CreateFEN() == FEN7);
-
-    ReadFEN(FEN8);
-    assert(CreateFEN() == FEN8);
-
-    ReadFEN(FEN9);
-    assert(CreateFEN() == FEN9);
-
-    ReadFEN(FEN10);
-    assert(CreateFEN() == FEN10);
-
-    for (uint64_t i : m_CastlingKeys)
-        std::cout << i << std::endl;
-    std::cout << m_WhiteTurnKey << std::endl;
-    std::cout << m_EnPassantKey << std::endl;
+    GenerateStateKey();
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
@@ -212,8 +178,14 @@ bool CBoard::ReadFEN(const std::string & fen) {
     else if ((m_EnPassant = TileToIndex(enPassant)) == OFFBOARD)
         return false;
 
-    m_Plies = ply;
-    m_Turns = turn;
+    if (ply >= 0)
+        m_Plies = ply;
+    else
+        return false;
+    if (turn >= 1)
+        m_Turns = turn;
+    else
+        return false;
 
     return true;
 }
@@ -221,10 +193,10 @@ bool CBoard::ReadFEN(const std::string & fen) {
 void CBoard::PrintState() const {
     for (int i = 0; i < 12; i++) {
         for (int j = 0; j < 10; j++) {
-            if (!m_Board[i*10+j])
+            if (!m_Board[i * 10 + j])
                 std::cout << '_';
             else
-                m_Board[i*10+j]->Print(std::cout);
+                m_Board[i * 10 + j]->Print(std::cout);
         }
         std::cout << '\n';
     }
@@ -237,21 +209,20 @@ void CBoard::PrintState() const {
 
 std::string CBoard::CreateFEN() const {
     std::string fen = "";
+    int code;
     int count = 0;
-    for (int i = 9; i > 1; i--) {
-        for (int j = 1; j < 9; j++) {
-//            std::cout << m_Board[i * 10 + j]->GetCode() << ' ' << j;
-            if (m_Board[i * 10 + j]->GetPiece() != EPiece::EMPTY)
-                fen.push_back(m_Board[i * 10 + j]->GetCode());
+    for (int i = 7; i >= 0; i--) {
+        for (int j = A1; j <= H1; j++) {
+            code = m_Board[i * 10 + j]->GetCode();
+            if (code != EMPTY)
+                fen.push_back(PIECE_CHAR_CODE[code]);
             else {
-                for (; j < 9 && m_Board[i * 10 + j]->GetPiece() == EPiece::EMPTY; j++)
+                for (; j <= H1 && m_Board[i * 10 + j]->GetCode() == EMPTY; j++)
                         count++;
                 j--;
                 fen.push_back(count + '0');
-//                std::cout << ' ' << count;
                 count = 0;
             }
-//            std::cout << std::endl;
         }
         fen.push_back('/');
     }
@@ -285,20 +256,38 @@ std::string CBoard::CreateFEN() const {
     return fen;
 }
 
-void CBoard::GenerateHashKeys() {
+void CBoard::InitiateHashKeys() {
     std::random_device seed;
     std::mt19937_64 gen(seed());
     std::uniform_int_distribution<uint64_t> dist;
 
-    for (char i : PIECE_CODES)
-        m_PieceKeys[i];
-        for (int i = 0; i < 64; i++)
-            m_PieceKeys[i].push_back(dist(gen));
+    for (int i = 0; i < 12; i++)
+        for (int j = 0; j < 120; j++)
+            m_PiecesKeys[i][j] = dist(gen);
     for (int i = 0; i < 16; i++)
         m_CastlingKeys[i] = dist(gen);
-
-    m_EnPassantKey = dist(gen);
+    for (int i = 0; i < 120; i++)
+        m_EnPassantKey[i] = dist(gen);
     m_WhiteTurnKey = dist(gen);
+}
+
+uint64_t CBoard::GenerateStateKey() {
+    uint64_t stateKey = 0;
+    for (int i = 0; i < 8; i++)
+        for (int j = A1; j <= H1; j++)
+            if (m_Board[i * 10 + j]->GetCode() != EMPTY)
+                stateKey ^= m_PiecesKeys[m_Board[i * 10 + j]->GetCode()][i * 10 + j];
+
+    if (m_WhiteTurn)
+        stateKey ^= m_WhiteTurnKey;
+
+    stateKey ^= m_CastlingKeys[m_Castling];
+
+    if (m_EnPassant != EMPTY)
+        stateKey ^= m_EnPassantKey[m_EnPassant];
+
+    m_StateKey = stateKey;
+    return stateKey;
 }
 
 

@@ -8,10 +8,10 @@
 #include <iostream>
 #include <memory>
 #include <set>
-#include "CCoord.h"
 #include "EColor.h"
 #include "EPiece.h"
 #include "ETile.h"
+#include "EConst.h"
 
 
 class CBoard;
@@ -21,10 +21,11 @@ protected:
     int m_Coord;
     EPiece m_Piece;
     EColor m_Color;
+    int m_PieceCode;
     size_t m_LastTurn = 0;
     CBoard & m_Board;
 public:
-    explicit CPiece(CBoard & board, int coord, EPiece piece, EColor color);
+    explicit CPiece(CBoard & board, int coord, EPiece piece, EColor color, int code);
 
     virtual ~CPiece() = default;
 
@@ -46,7 +47,9 @@ public:
         return m_Color;
     }
 
-    virtual char GetCode() const = 0;
+    int GetCode() const {
+        return m_PieceCode;
+    }
 };
 
 
