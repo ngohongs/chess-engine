@@ -13,7 +13,7 @@ CBoard::CBoard() {
     ReadFEN(START_FEN);
     assert(CreateFEN() == START_FEN);
     GenerateStateKey();
-    PrintState();
+    TilesAttackedBy(EColor::WHITE);
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
@@ -337,7 +337,7 @@ bool CBoard::TileAttacked(EColor attacker, int tile) const {
 
     //King attacks
     for (int i : KING_ATTACKS) {
-        if (m_Board[tile +  i]->GetPiece() == EPiece::KNIGHT && m_Board[tile + i]->GetColor() == attacker)
+        if (m_Board[tile +  i]->GetPiece() == EPiece::KING && m_Board[tile + i]->GetColor() == attacker)
             return true;
     }
 
