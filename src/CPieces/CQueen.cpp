@@ -17,5 +17,27 @@ std::ostream & CQueen::Print(std::ostream & os) const {
 }
 
 std::list<CMove> CQueen::MoveList() const {
-    return std::list<CMove>();
+    std::list<CMove> moveList;
+    int tempTile;
+    EColor oppositeSide = OppositeSide(m_Color);
+    EPiece piece;
+    EColor color;
+    //Rook attacks
+    for (int i : KING_ATTACKS) {
+        tempTile = m_Coord + i;
+        while (!m_Board.IsOffboard(tempTile)) {
+            piece = m_Board[tempTile]->GetPiece();
+            color = m_Board[tempTile]->GetColor();
+            if (piece == EPiece::EMPTY)
+                moveList.push_back(PushMove(m_Coord, tempTile));
+
+            if (piece != EPiece::EMPTY) {
+                if (color == oppositeSide)
+                    moveList.push_back(CaptureMove(m_Coord, tempTile, m_Board[tempTile]->GetPiece()));
+                break;
+            }
+            tempTile += i;
+        }
+    }
+    return moveList;
 }

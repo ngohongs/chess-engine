@@ -18,7 +18,7 @@ std::ostream & CKnight::Print(std::ostream & os) const {
 
 std::list<CMove> CKnight::MoveList() const {
     std::list<CMove> moveList;
-    EColor oppositeSide = m_Color == EColor::WHITE ? EColor::BLACK : EColor::WHITE;
+    EColor oppositeSide = OppositeSide(m_Color);
     for (const auto & i : KNIGHT_ATTACKS) {
         if (m_Board.IsOffboard(m_Coord + i))
             continue;

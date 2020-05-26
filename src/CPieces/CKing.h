@@ -11,6 +11,7 @@
 
 class CKing : public CPiece {
 private:
+    bool KingNeighbour(int index) const;
 public:
     explicit CKing(CBoard & board, int coord, EColor color);
 

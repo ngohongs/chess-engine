@@ -22,7 +22,7 @@ std::list<CMove> CPawn::MoveList() const {
     int forward = m_Color == EColor::WHITE ? 10 : -10;
     int diagonalOne = m_Color == EColor::WHITE ? 9 : -9;
     int diagonalTwo = m_Color == EColor::WHITE ? 11 : -11;
-    EColor oppositeSide = m_Color == EColor::WHITE ? EColor::BLACK : EColor::WHITE;
+    EColor oppositeSide = OppositeSide(m_Color);
     int startRank = m_Color == EColor::WHITE ? RANK_2 : RANK_7;
     int promotionRank = m_Color == EColor::WHITE ? RANK_7 : RANK_2;
     //Push move

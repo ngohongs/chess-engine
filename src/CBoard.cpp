@@ -10,11 +10,14 @@ CBoard::CBoard() {
         m_Board[i] = std::make_shared<COffboard>(COffboard(*this, i));
 
     InitiateHashKeys();
-    ReadFEN(KINGKNIGHTMOVE);
-    assert(CreateFEN() == KINGKNIGHTMOVE);
+
+    ReadFEN(QUEENMOVE);
+    assert(CreateFEN() == QUEENMOVE);
+
+
     GenerateStateKey();
 
-    GenerateAllMoves(EColor::BLACK);
+    GenerateAllMoves(EColor::WHITE);
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
@@ -324,7 +327,7 @@ bool CBoard::TileAttacked(EColor attacker, int tile) const {
     //Rook attacks with half of queen attacks
     for (int i : ROOK_ATTACKS) {
         tempTile = tile + i;
-        while (m_Board[tempTile]) {
+        while (!IsOffboard(tempTile)) {
             piece = m_Board[tempTile]->GetPiece();
             color = m_Board[tempTile]->GetColor();
             if (piece != EPiece::EMPTY) {
@@ -338,7 +341,7 @@ bool CBoard::TileAttacked(EColor attacker, int tile) const {
     //Bishop attacks with half of queen attacks
     for (int i : BISHOP_ATTACKS) {
         tempTile = tile + i;
-        while (m_Board[tempTile]) {
+        while (!IsOffboard(tempTile)) {
             piece = m_Board[tempTile]->GetPiece();
             color = m_Board[tempTile]->GetColor();
             if (piece != EPiece::EMPTY) {

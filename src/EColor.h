@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <stdexcept>
+
 
 enum class EColor : char {
     WHITE = 'W',
@@ -12,5 +14,6 @@ enum class EColor : char {
     NONE = ' '
 };
 
+EColor OppositeSide(EColor self);
 
 
