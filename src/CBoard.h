@@ -44,6 +44,9 @@ private:
     std::list<std::shared_ptr<CPiece>> m_WhitePieces;
     std::list<std::shared_ptr<CPiece>> m_BlackPieces;
 
+    int m_WhiteKing = E1;
+    int m_BlackKing = E8;
+
     uint64_t m_PiecesKeys[12][120];
     uint64_t m_CastlingKeys[16];
     uint64_t m_EnPassantKey[120];

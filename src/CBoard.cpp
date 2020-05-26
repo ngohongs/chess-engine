@@ -10,9 +10,11 @@ CBoard::CBoard() {
         m_Board[i] = std::make_shared<COffboard>(COffboard(*this, i));
 
     InitiateHashKeys();
-    ReadFEN(START_FEN);
-    assert(CreateFEN() == START_FEN);
+    ReadFEN(KINGKNIGHTMOVE);
+    assert(CreateFEN() == KINGKNIGHTMOVE);
     GenerateStateKey();
+
+    GenerateAllMoves(EColor::BLACK);
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
@@ -82,6 +84,7 @@ bool CBoard::ReadFEN(const std::string & fen) {
                 case 'K':
                     m_Board[position] = std::make_shared<CKing>(CKing(*this, position, EColor::WHITE));
                     m_WhitePieces.push_back(m_Board[position]);
+                    m_WhiteKing = position;
                     position++;
                     file++;
                     break;
@@ -119,6 +122,7 @@ bool CBoard::ReadFEN(const std::string & fen) {
                 case 'k':
                     m_Board[position] = std::make_shared<CKing>(CKing(*this, position, EColor::BLACK));
                     m_BlackPieces.push_back(m_Board[position]);
+                    m_BlackKing = position;
                     position++;
                     file++;
                     break;

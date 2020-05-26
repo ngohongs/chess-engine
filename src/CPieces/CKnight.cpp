@@ -17,5 +17,17 @@ std::ostream & CKnight::Print(std::ostream & os) const {
 }
 
 std::list<CMove> CKnight::MoveList() const {
-    return std::list<CMove>();
+    std::list<CMove> moveList;
+    EColor oppositeSide = m_Color == EColor::WHITE ? EColor::BLACK : EColor::WHITE;
+    for (const auto & i : KNIGHT_ATTACKS) {
+        if (m_Board.IsOffboard(m_Coord + i))
+            continue;
+        // Push move
+        if (m_Board.IsEmpty(m_Coord + i))
+            moveList.push_back(PushMove(m_Coord, m_Coord + i));
+        // Capture move
+        if (m_Board[m_Coord + i]->GetColor() == oppositeSide)
+            moveList.push_back(CaptureMove(m_Coord, m_Coord + i, m_Board[m_Coord + i]->GetPiece()));
+    }
+    return moveList;
 }
