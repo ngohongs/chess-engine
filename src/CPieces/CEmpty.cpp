@@ -12,3 +12,7 @@ CEmpty::CEmpty(CBoard & board, int coord)
 std::ostream & CEmpty::Print(std::ostream & os) const {
     return os << '.';
 }
+
+std::list<CMove> CEmpty::MoveList() const {
+    return std::list<CMove>();
+}

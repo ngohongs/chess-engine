@@ -15,4 +15,6 @@ public:
     explicit CBishop(CBoard & board, int coord, EColor color);
 
     std::ostream & Print(std::ostream & os) const override;
+
+    std::list<CMove> MoveList() const;
 };

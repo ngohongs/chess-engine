@@ -6,6 +6,14 @@
 #include "ETile.h"
 
 
+int GetRank(int position) {
+    return position / 10 - 2;
+}
+
+int GetFile(int position) {
+    return position % 10 - 1;
+}
+
 int TileToIndex(const std::string & position) {
     if (position.length() != 2)
         return 0;
@@ -31,4 +39,14 @@ std::string IndexToTile(int index) {
     res.push_back(rank - 2 + '1');
 
     return res;
+}
+
+bool IsOffboard(int position) {
+    if (position % 10 == 0 || position % 10 == 9)
+        return true;
+    if (0 <= position && position <= 19)
+        return true;
+    if (100 <= position && position <= 119)
+        return true;
+    return false;
 }

@@ -9,7 +9,7 @@
 #include <cassert>
 #include <string>
 #include <cstring>
-#include <map>
+#include <list>
 #include <vector>
 #include <memory>
 #include <sstream>
@@ -34,13 +34,15 @@ class CPiece;
 
 class CBoard {
 private:
-    using TBoard = std::vector<std::unique_ptr<CPiece>>;
-    std::unique_ptr<CPiece> m_Board[120];
+    std::shared_ptr<CPiece> m_Board[120];
     unsigned int m_Castling = 0xF;
     int m_Plies = 0;
     int m_Turns = 1;
     int m_EnPassant = EMPTY;
-    int m_WhiteTurn = true;
+    EColor m_Side = EColor::WHITE;
+
+    std::list<std::shared_ptr<CPiece>> m_WhitePieces;
+    std::list<std::shared_ptr<CPiece>> m_BlackPieces;
 
     uint64_t m_PiecesKeys[12][120];
     uint64_t m_CastlingKeys[16];
@@ -64,6 +66,16 @@ public:
     void PrintState() const;
 
     void TilesAttackedBy(EColor attacker) const;
+
+    const std::shared_ptr<CPiece> & operator[](int index) const;
+
+    std::shared_ptr<CPiece> & operator[](int index);
+
+    std::list<CMove> GenerateAllMoves(EColor side) const;
+
+    int GetEnPassant() const;
+    bool IsEmpty(int index) const;
+    bool IsOffboard(int index) const;
 };
 
 

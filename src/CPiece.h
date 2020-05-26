@@ -7,7 +7,8 @@
 
 #include <iostream>
 #include <memory>
-#include <set>
+#include <list>
+#include "CMove.h"
 #include "EColor.h"
 #include "EPiece.h"
 #include "ETile.h"
@@ -29,7 +30,7 @@ public:
 
     virtual ~CPiece() = default;
 
-//    virtual std::set<CCoord> Moveset() = 0;
+    virtual std::list<CMove> MoveList() const = 0;
 
     virtual std::ostream & Print(std::ostream & os) const = 0;
 

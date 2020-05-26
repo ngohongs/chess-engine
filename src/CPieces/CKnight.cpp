@@ -15,3 +15,7 @@ std::ostream & CKnight::Print(std::ostream & os) const {
     return os << (m_Color == EColor::WHITE ? 'N' : 'n');
     //return os << (m_Color == EColor::WHITE ? "\u2658" : "\u265e");
 }
+
+std::list<CMove> CKnight::MoveList() const {
+    return std::list<CMove>();
+}

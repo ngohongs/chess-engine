@@ -13,6 +13,8 @@ public:
     CEmpty(CBoard & board, int coord);
 
     std::ostream & Print(std::ostream & os) const;
+
+    std::list<CMove> MoveList() const;
 };
 
 

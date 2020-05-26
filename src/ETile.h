@@ -18,6 +18,16 @@ enum {
     A8 = 91, B8, C8, D8, E8, F8, G8, H8, OFFBOARD
 };
 
+enum {RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8};
+
+enum {FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H};
+
+int GetRank(int position);
+
+int GetFile(int position);
+
+bool IsOffboard(int position);
+
 int TileToIndex(const std::string & position);
 
 std::string IndexToTile(int index);

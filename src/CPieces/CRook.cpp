@@ -15,3 +15,7 @@ std::ostream & CRook::Print(std::ostream & os) const {
     return os << (m_Color == EColor::WHITE ? 'R' : 'r');
     //return os << (m_Color == EColor::WHITE ? "\u2656" : "\u265c");
 }
+
+std::list<CMove> CRook::MoveList() const {
+    return std::list<CMove>();
+}

@@ -7,7 +7,7 @@
 
 CBoard::CBoard() {
     for (int i = 0; i < 120; i++)
-        m_Board[i] = std::make_unique<COffboard>(COffboard(*this, i));
+        m_Board[i] = std::make_shared<COffboard>(COffboard(*this, i));
 
     InitiateHashKeys();
     ReadFEN(START_FEN);
@@ -50,63 +50,75 @@ bool CBoard::ReadFEN(const std::string & fen) {
                 break;
             switch (*i) {
                 case 'P':
-                    m_Board[position] = std::make_unique<CPawn>(CPawn(*this, position, EColor::WHITE));
+                    m_Board[position] = std::make_shared<CPawn>(CPawn(*this, position, EColor::WHITE));
+                    m_WhitePieces.push_back(m_Board[position]);
                     position++;
                     file++;
                     break;
                 case 'N':
-                    m_Board[position] = std::make_unique<CKnight>(CKnight(*this, position, EColor::WHITE));
+                    m_Board[position] = std::make_shared<CKnight>(CKnight(*this, position, EColor::WHITE));
+                    m_WhitePieces.push_back(m_Board[position]);
                     position++;
                     file++;
                     break;
                 case 'B':
-                    m_Board[position] = std::make_unique<CBishop>(CBishop(*this, position, EColor::WHITE));
+                    m_Board[position] = std::make_shared<CBishop>(CBishop(*this, position, EColor::WHITE));
+                    m_WhitePieces.push_back(m_Board[position]);
                     position++;
                     file++;
                     break;
                 case 'R':
-                    m_Board[position] = std::make_unique<CRook>(CRook(*this, position, EColor::WHITE));
+                    m_Board[position] = std::make_shared<CRook>(CRook(*this, position, EColor::WHITE));
+                    m_WhitePieces.push_back(m_Board[position]);
                     position++;
                     file++;
                     break;
                 case 'Q':
-                    m_Board[position] = std::make_unique<CQueen>(CQueen(*this, position, EColor::WHITE));
+                    m_Board[position] = std::make_shared<CQueen>(CQueen(*this, position, EColor::WHITE));
+                    m_WhitePieces.push_back(m_Board[position]);
                     position++;
                     file++;
                     break;
                 case 'K':
-                    m_Board[position] = std::make_unique<CKing>(CKing(*this, position, EColor::WHITE));
+                    m_Board[position] = std::make_shared<CKing>(CKing(*this, position, EColor::WHITE));
+                    m_WhitePieces.push_back(m_Board[position]);
                     position++;
                     file++;
                     break;
 
                 case 'p':
-                    m_Board[position] = std::make_unique<CPawn>(CPawn(*this, position, EColor::BLACK));
+                    m_Board[position] = std::make_shared<CPawn>(CPawn(*this, position, EColor::BLACK));
+                    m_BlackPieces.push_back(m_Board[position]);
                     position++;
                     file++;
                     break;
                 case 'n':
-                    m_Board[position] = std::make_unique<CKnight>(CKnight(*this, position, EColor::BLACK));
+                    m_Board[position] = std::make_shared<CKnight>(CKnight(*this, position, EColor::BLACK));
+                    m_BlackPieces.push_back(m_Board[position]);
                     position++;
                     file++;
                     break;
                 case 'b':
-                    m_Board[position] = std::make_unique<CBishop>(CBishop(*this, position, EColor::BLACK));
+                    m_Board[position] = std::make_shared<CBishop>(CBishop(*this, position, EColor::BLACK));
+                    m_BlackPieces.push_back(m_Board[position]);
                     position++;
                     file++;
                     break;
                 case 'r':
-                    m_Board[position] = std::make_unique<CRook>(CRook(*this, position, EColor::BLACK));
+                    m_Board[position] = std::make_shared<CRook>(CRook(*this, position, EColor::BLACK));
+                    m_BlackPieces.push_back(m_Board[position]);
                     position++;
                     file++;
                     break;
                 case 'q':
-                    m_Board[position] = std::make_unique<CQueen>(CQueen(*this, position, EColor::BLACK));
+                    m_Board[position] = std::make_shared<CQueen>(CQueen(*this, position, EColor::BLACK));
+                    m_BlackPieces.push_back(m_Board[position]);
                     position++;
                     file++;
                     break;
                 case 'k':
-                    m_Board[position] = std::make_unique<CKing>(CKing(*this, position, EColor::BLACK));
+                    m_Board[position] = std::make_shared<CKing>(CKing(*this, position, EColor::BLACK));
+                    m_BlackPieces.push_back(m_Board[position]);
                     position++;
                     file++;
                     break;
@@ -120,7 +132,7 @@ bool CBoard::ReadFEN(const std::string & fen) {
                 case '7':
                 case '8':
                     for (int j = 0; j < (*i - '0'); j++) {
-                        m_Board[position] = std::make_unique<CEmpty>(CEmpty(*this, position));
+                        m_Board[position] = std::make_shared<CEmpty>(CEmpty(*this, position));
                         position++;
                         file++;
                     }
@@ -143,9 +155,9 @@ bool CBoard::ReadFEN(const std::string & fen) {
         return false;
 
     if (whiteTurn == 'w')
-        m_WhiteTurn = true;
+        m_Side = EColor::WHITE;
     else if (whiteTurn == 'b')
-        m_WhiteTurn = false;
+        m_Side = EColor::BLACK;
     else
         return false;
 
@@ -195,7 +207,7 @@ void CBoard::PrintState() const {
         }
         std::cout << '\n';
     }
-    std::cout << "side: " << (m_WhiteTurn ? 'w' : 'b') << std::endl;
+    std::cout << "side: " << (m_Side == EColor::WHITE ? 'w' : 'b') << std::endl;
     std::cout << "En Passant: " << IndexToTile(m_EnPassant) << std::endl;
     std::cout << "Castling: " << (m_Castling & 0x8U ? "K" : "") << (m_Castling & 0x4U ? "Q" : "")
                               << (m_Castling & 0x2U ? "k" : "") << (m_Castling & 0x1U ? "q" : "")
@@ -224,7 +236,7 @@ std::string CBoard::CreateFEN() const {
     fen.pop_back();
 
     fen.push_back(' ');
-    fen.push_back(m_WhiteTurn ? 'w' : 'b');
+    fen.push_back(m_Side == EColor::WHITE ? 'w' : 'b');
     fen.push_back(' ');
     if (m_Castling & WHITE_KING_CASTLE)
         fen.push_back('K');
@@ -273,7 +285,7 @@ uint64_t CBoard::GenerateStateKey() {
             if (m_Board[i * 10 + j]->GetCode() != EMPTY)
                 stateKey ^= m_PiecesKeys[m_Board[i * 10 + j]->GetCode()][i * 10 + j];
 
-    if (m_WhiteTurn)
+    if (m_Side == EColor::WHITE)
         stateKey ^= m_WhiteTurnKey;
 
     stateKey ^= m_CastlingKeys[m_Castling];
@@ -358,4 +370,45 @@ void CBoard::TilesAttackedBy(EColor attacker) const {
     }
     std::cout << "  +-----------------+" << std::endl;
     std::cout << "    A B C D E F G H" << std::endl;
+}
+
+const std::shared_ptr<CPiece> & CBoard::operator[](int index) const {
+    return m_Board[index];
+}
+
+std::shared_ptr<CPiece> & CBoard::operator[](int index) {
+    return m_Board[index];
+}
+
+bool CBoard::IsEmpty(int index) const {
+    return m_Board[index]->GetPiece() == EPiece::EMPTY;
+}
+
+bool CBoard::IsOffboard(int index) const {
+    return m_Board[index]->GetPiece() == EPiece::OFFBOARD;
+}
+
+int CBoard::GetEnPassant() const {
+    return m_EnPassant;
+}
+
+std::list<CMove> CBoard::GenerateAllMoves(EColor side) const {
+    std::list<CMove> moveList;
+    int count = 0;
+    if (side == EColor::WHITE)
+        for (const auto & i : m_WhitePieces)
+            moveList.splice(moveList.end(), i->MoveList());
+    else
+        for (const auto & i : m_BlackPieces)
+            moveList.splice(moveList.end(), i->MoveList());
+
+
+    for (const auto & i : moveList) {
+        std::cout << "move #" << ++count << "\t";
+        i.Print(std::cout);
+        std::cout << std::endl;
+    }
+    std::cout << "Total moves: " << count << std::endl;
+
+    return moveList;
 }

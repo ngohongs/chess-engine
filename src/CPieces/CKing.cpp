@@ -15,3 +15,7 @@ std::ostream & CKing::Print(std::ostream & os) const {
         return os << (m_Color == EColor::WHITE ? 'K' : 'k');
         //return os << (m_Color == EColor::WHITE ? "\u2654" : "\u265a");
 }
+
+std::list<CMove> CKing::MoveList() const {
+    return std::list<CMove>();
+}

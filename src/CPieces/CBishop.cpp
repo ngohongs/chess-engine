@@ -15,3 +15,7 @@ std::ostream & CBishop::Print(std::ostream & os) const {
     return os << (m_Color == EColor::WHITE ? 'B' : 'b');
     //return os << (m_Color == EColor::WHITE ? "\u2657" : "\u265d");
 }
+
+std::list<CMove> CBishop::MoveList() const {
+    return std::list<CMove>();
+}

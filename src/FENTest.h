@@ -16,3 +16,6 @@ const char * const FEN7 = "bB6/1RN5/P1p5/n3p2r/4k3/4P1Q1/KPPP4/8 w - - 0 1";
 const char * const FEN8 = "r4b2/r5P1/N2P4/1R2KP2/3p1Pp1/5k2/1n4p1/7N w - - 0 1";
 const char * const FEN9 = "1N6/3nBp2/1P2pPR1/8/K3k2P/3bP3/2p4P/3B4 w - - 0 1";
 const char * const FEN10 = "6b1/1p1k2Kp/1P6/1pPBn3/N1q3N1/8/1B1P2Q1/8 w - h8 0 1";
+
+const char * const PAWNMOVEWHITE = "rnbqkb1r/pp1p1pPp/8/2p1pP2/1P1P4/3P3P/P1P1P3/RNBQKBNR w KQkq e6 0 1";
+const char * const PAWNMOVEBLACK = "rnbqkbnr/p1p1p3/3p3p/1p1p4/2P1Pp2/8/PP1P1PpP/RNBQKB1R b KQkq e3 0 1";

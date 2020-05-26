@@ -15,6 +15,8 @@ public:
     explicit CKnight(CBoard & board, int coord, EColor color);
 
     std::ostream & Print(std::ostream & os) const;
+
+    std::list<CMove> MoveList() const;
 };
 
 

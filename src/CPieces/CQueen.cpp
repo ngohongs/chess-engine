@@ -15,3 +15,7 @@ std::ostream & CQueen::Print(std::ostream & os) const {
     return os << (m_Color == EColor::WHITE ? 'Q' : 'q');
     //return os << (m_Color == EColor::WHITE ? "\u2655" : "\u265b");
 }
+
+std::list<CMove> CQueen::MoveList() const {
+    return std::list<CMove>();
+}

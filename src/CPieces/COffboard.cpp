@@ -12,3 +12,7 @@ COffboard::COffboard(CBoard & board, int coord)
 std::ostream & COffboard::Print(std::ostream & os) const {
     return os << '-';
 }
+
+std::list<CMove> COffboard::MoveList() const {
+    return std::list<CMove>();
+}
