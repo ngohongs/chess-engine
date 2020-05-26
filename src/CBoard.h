@@ -77,6 +77,7 @@ public:
     std::list<CMove> GenerateAllMoves(EColor side) const;
 
     int GetEnPassant() const;
+    unsigned int GetCastling() const;
     bool IsEmpty(int index) const;
     bool IsOffboard(int index) const;
 };

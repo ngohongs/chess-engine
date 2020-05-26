@@ -8,6 +8,7 @@
 #include <iostream>
 #include "EPiece.h"
 #include "ETile.h"
+#include "EConst.h"
 
 class CMove {
 private:
@@ -34,6 +35,8 @@ CMove CaptureMove(int from, int to, EPiece capture, bool enPassant = false);
 CMove PawnTwoForward(int from, int to);
 
 CMove PromotionMove(int from, int to, EPiece capture, EPiece promotion);
+
+CMove CastleMove(int castling);
 
 
 

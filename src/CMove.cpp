@@ -31,3 +31,16 @@ CMove PawnTwoForward(int from, int to) {
 CMove CaptureMove(int from, int to, EPiece capture, bool enPassant) {
     return CMove(from, to, capture, enPassant);
 }
+
+CMove CastleMove(int castling) {
+    if (castling & WHITE_KING_CASTLE)
+        return CMove(E1, G1, EPiece::EMPTY, false, false, EPiece::EMPTY, true, 0);
+    else if (castling & WHITE_QUEEN_CASTLE)
+        return CMove(E1, C1, EPiece::EMPTY, false, false, EPiece::EMPTY, true, 0);
+    else if (castling & BLACK_KING_CASTLE)
+        return CMove(E8, G8, EPiece::EMPTY, false, false, EPiece::EMPTY, true, 0);
+    else if (castling & BLACK_QUEEN_CASTLE)
+        return CMove(E8, C8, EPiece::EMPTY, false, false, EPiece::EMPTY, true, 0);
+    else
+        throw std::logic_error("Cannot castle");
+}

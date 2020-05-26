@@ -18,3 +18,7 @@ std::ostream & operator<<(std::ostream & os, const CPiece & self) {
     return self.Print(os);
 }
 
+size_t CPiece::GetLastTurn() const {
+    return m_LastTurn;
+}
+

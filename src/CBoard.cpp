@@ -11,13 +11,10 @@ CBoard::CBoard() {
 
     InitiateHashKeys();
 
-    ReadFEN(QUEENMOVE);
-    assert(CreateFEN() == QUEENMOVE);
-
+    ReadFEN(CASTLEMOVE2);
+    assert(CreateFEN() == CASTLEMOVE2);
 
     GenerateStateKey();
-
-    GenerateAllMoves(EColor::WHITE);
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
@@ -418,4 +415,8 @@ std::list<CMove> CBoard::GenerateAllMoves(EColor side) const {
     std::cout << "Total moves: " << count << std::endl;
 
     return moveList;
+}
+
+unsigned int CBoard::GetCastling() const {
+    return m_Castling;
 }

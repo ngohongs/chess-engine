@@ -51,6 +51,8 @@ public:
     int GetCode() const {
         return m_PieceCode;
     }
+
+    size_t GetLastTurn() const;
 };
 
 
