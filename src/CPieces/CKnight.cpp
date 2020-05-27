@@ -24,10 +24,11 @@ std::list<CMove> CKnight::MoveList() const {
             continue;
         // Push move
         if (m_Board.IsEmpty(m_Coord + i))
-            moveList.push_back(PushMove(m_Coord, m_Coord + i));
+            moveList.push_back(PushMove(m_Color, m_Coord, m_Coord + i));
         // Capture move
         if (m_Board[m_Coord + i]->GetColor() == oppositeSide)
-            moveList.push_back(CaptureMove(m_Coord, m_Coord + i, m_Board[m_Coord + i]->GetPiece()));
+            moveList.push_back(CaptureMove(m_Color, m_Coord, m_Coord + i, m_Board[m_Coord + i]->GetPiece(),
+                                           false));
     }
     return moveList;
 }

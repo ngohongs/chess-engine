@@ -11,6 +11,7 @@ const char * const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ
 enum {p, n, b, r, q , k, P, N, B, R, Q, K, EMPTY};
 
 const char PIECE_CHAR_CODE[13] = {'p', 'n', 'b', 'r', 'q', 'k', 'P', 'N', 'B', 'R', 'Q', 'K', ' '};
+const int PIECE_SCORE[13] = {100, 325, 325, 550, 1000, 50000, 100, 325, 325, 550, 1000, 50000, 0};
 
 const int KNIGHT_ATTACKS[8] = {-21, -19, -12, -8, 8, 12, 19, 21};
 const int ROOK_ATTACKS[4] = {-10, -1, 1, 10};

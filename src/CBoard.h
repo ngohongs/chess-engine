@@ -1,3 +1,4 @@
+#include <climits>
 /*
  * @author Hong Son Ngo <ngohongs@fit.cvut.cz>
  * @date 14/05/2020.
@@ -25,6 +26,8 @@
 #include "CPieces/CEmpty.h"
 #include "CPieces/COffboard.h"
 #include "CMove.h"
+#include "CHashKey.h"
+#include "CHistory.h"
 #include "ETile.h"
 #include "EConst.h"
 #include "FENTest.h"
@@ -38,6 +41,7 @@ private:
     unsigned int m_Castling = 0xF;
     int m_Plies = 0;
     int m_Turns = 1;
+    int m_FiftyTurns = 0;
     int m_EnPassant = EMPTY;
     EColor m_Side = EColor::WHITE;
 
@@ -47,14 +51,13 @@ private:
     int m_WhiteKing = E1;
     int m_BlackKing = E8;
 
-    uint64_t m_PiecesKeys[12][120];
-    uint64_t m_CastlingKeys[16];
-    uint64_t m_EnPassantKey[120];
-    uint64_t m_WhiteTurnKey;
-
+    CHashKey m_HashKeys;
     uint64_t m_StateKey;
-    void InitiateHashKeys();
-    uint64_t GenerateStateKey();
+
+    int m_WhiteScore;
+    int m_BlackScore;
+
+    std::vector<CHistory> m_History;
 public:
     CBoard();
 
@@ -76,10 +79,20 @@ public:
 
     std::list<CMove> GenerateAllMoves(EColor side) const;
 
+    bool RemovePiece(int index);
+
+    bool AddPiece(int index, EPiece piece, EColor color);
+
+    bool MovePiece(int from, int to);
+
+    bool MakeMove(const CMove & move);
+
+    bool UndoMove();
     int GetEnPassant() const;
     unsigned int GetCastling() const;
     bool IsEmpty(int index) const;
     bool IsOffboard(int index) const;
+    void UpdateScore();
 };
 
 

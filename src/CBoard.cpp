@@ -1,3 +1,4 @@
+#include <climits>
 /*
  * @author Hong Son Ngo <ngohongs@fit.cvut.cz>
  * @date 14/05/2020.
@@ -9,12 +10,10 @@ CBoard::CBoard() {
     for (int i = 0; i < 120; i++)
         m_Board[i] = std::make_shared<COffboard>(COffboard(*this, i));
 
-    InitiateHashKeys();
-
     ReadFEN(CASTLEMOVE2);
     assert(CreateFEN() == CASTLEMOVE2);
+    m_StateKey = m_HashKeys.GenerateStateKey(m_Board, m_Side, m_Castling, m_EnPassant);
 
-    GenerateStateKey();
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
@@ -267,40 +266,6 @@ std::string CBoard::CreateFEN() const {
     return fen;
 }
 
-void CBoard::InitiateHashKeys() {
-    std::random_device seed;
-    std::mt19937_64 gen(seed());
-    std::uniform_int_distribution<uint64_t> dist;
-
-    for (int i = 0; i < 12; i++)
-        for (int j = 0; j < 120; j++)
-            m_PiecesKeys[i][j] = dist(gen);
-    for (int i = 0; i < 16; i++)
-        m_CastlingKeys[i] = dist(gen);
-    for (int i = 0; i < 120; i++)
-        m_EnPassantKey[i] = dist(gen);
-    m_WhiteTurnKey = dist(gen);
-}
-
-uint64_t CBoard::GenerateStateKey() {
-    uint64_t stateKey = 0;
-    for (int i = 0; i < 8; i++)
-        for (int j = A1; j <= H1; j++)
-            if (m_Board[i * 10 + j]->GetCode() != EMPTY)
-                stateKey ^= m_PiecesKeys[m_Board[i * 10 + j]->GetCode()][i * 10 + j];
-
-    if (m_Side == EColor::WHITE)
-        stateKey ^= m_WhiteTurnKey;
-
-    stateKey ^= m_CastlingKeys[m_Castling];
-
-    if (m_EnPassant != EMPTY)
-        stateKey ^= m_EnPassantKey[m_EnPassant];
-
-    m_StateKey = stateKey;
-    return stateKey;
-}
-
 bool CBoard::TileAttacked(EColor attacker, int tile) const {
     // Pawn attacking
     if (attacker == EColor::WHITE) {
@@ -396,7 +361,7 @@ int CBoard::GetEnPassant() const {
     return m_EnPassant;
 }
 
-std::list<CMove> CBoard::GenerateAllMoves(EColor side) const {
+__unused std::list<CMove> CBoard::GenerateAllMoves(EColor side) const {
     std::list<CMove> moveList;
     int count = 0;
     if (side == EColor::WHITE)
@@ -420,3 +385,256 @@ std::list<CMove> CBoard::GenerateAllMoves(EColor side) const {
 unsigned int CBoard::GetCastling() const {
     return m_Castling;
 }
+
+bool CBoard::RemovePiece(int index) {
+    EColor targetColor = m_Board[index]->GetColor();
+    int targetCode = m_Board[index]->GetCode();
+    if (IsOffboard(index) || IsEmpty(index))
+        throw std::logic_error("Cannot remove piece offboard or empty piece");
+
+    if (targetColor == EColor::WHITE) {
+        m_WhitePieces.remove(m_Board[index]);
+        m_WhiteScore -= PIECE_SCORE[targetCode];
+    }
+    else {
+        m_BlackPieces.remove(m_Board[index]);
+        m_BlackScore -= PIECE_SCORE[targetCode];
+    }
+
+    m_StateKey = m_HashKeys.HashPiece(m_Board[index]->GetCode(), index);
+    m_Board[index] = std::make_shared<CEmpty>(CEmpty(*this, index));
+    return true;
+}
+
+bool CBoard::AddPiece(int index, EPiece piece, EColor color) {
+    std::shared_ptr<CPiece> target;
+    if (piece == EPiece::PAWN)
+        target = std::make_shared<CPawn>(CPawn(*this, index, color));
+    else if (piece == EPiece::KNIGHT)
+        target = std::make_shared<CKnight>(CKnight(*this, index, color));
+    else if (piece == EPiece::ROOK)
+        target = std::make_shared<CRook>(CRook(*this, index, color));
+    else if (piece == EPiece::BISHOP)
+        target = std::make_shared<CBishop>(CBishop(*this, index, color));
+    else if (piece == EPiece::QUEEN)
+        target = std::make_shared<CQueen>(CQueen(*this, index, color));
+    else if (piece == EPiece::KING)
+        target = std::make_shared<CKing>(CKing(*this, index, color));
+    else
+        throw std::logic_error("Cannot add empty or offboard piece");
+
+    m_StateKey = m_HashKeys.HashPiece(target->GetCode(), index);
+
+    if (color == EColor::WHITE) {
+        m_WhitePieces.push_back(target);
+        m_WhiteScore += PIECE_SCORE[target->GetCode()];
+    }
+    else {
+        m_BlackPieces.push_back(target);
+        m_BlackScore += PIECE_SCORE[target->GetCode()];
+    }
+
+    return true;
+}
+
+void CBoard::UpdateScore() {
+    m_WhiteScore = 0;
+    m_BlackScore = 0;
+    for (int i = 7; i >= 0; i--) {
+        for (int j = A1; j <= H1; j++) {
+            if (m_Board[j + i * 10]->GetColor() == EColor::WHITE)
+                m_WhiteScore += PIECE_SCORE[m_Board[j + i * 10]->GetCode()];
+            if (m_Board[j + i * 10]->GetColor() == EColor::BLACK)
+                m_BlackScore += PIECE_SCORE[m_Board[j + i * 10]->GetCode()];
+        }
+    }
+}
+
+bool CBoard::MovePiece(int from, int to) {
+    int pieceToMoveCode = m_Board[from]->GetCode();
+    if (IsOffboard(from) || IsOffboard(to))
+        throw std::logic_error("Cannot move from || to offboard piece");
+
+    m_StateKey = m_HashKeys.HashPiece(pieceToMoveCode, from);
+    m_Board[from] = std::make_shared<CEmpty>(CEmpty(*this, from));
+
+    m_StateKey = m_HashKeys.HashPiece(pieceToMoveCode, to);
+    return true;
+}
+
+bool CBoard::MakeMove(const CMove & move) {
+    CHistory targetMove;
+    targetMove.m_StateKey = m_StateKey;
+    int from = move.GetFrom();
+    int to = move.GetTo();
+    m_History.push_back(targetMove);
+
+    if (move.IsEnPassant()) {
+        if (move.IsWhiteMove())
+            RemovePiece(move.GetTo() - 10);
+        else
+            RemovePiece(move.GetTo() + 10);
+    }
+    else if (move.IsCastling()) {
+        switch (to) {
+            case C1:
+                MovePiece(A1, D1);
+            case C8:
+                MovePiece(A8, D8);
+            case G1:
+                MovePiece(H1, F1);
+            case G8:
+                MovePiece(H8, F8);
+            default:
+                throw std::logic_error("Invalid castling move");
+
+        }
+    }
+    if (m_EnPassant != EMPTY)
+        m_StateKey = m_HashKeys.HashEnPassant(m_EnPassant);
+    m_StateKey = m_HashKeys.HashCastling(m_Castling);
+
+    targetMove.m_Move = move;
+    targetMove.m_FiftyTurns = m_FiftyTurns;
+    targetMove.m_EnPassant = m_EnPassant;
+    targetMove.m_Castling = m_Castling;
+
+
+    if (from == A1 )//|| to == A1)
+        m_Castling &= 0xB;
+    if (from == H1 )//|| to == H1)
+        m_Castling &= 0x7;
+    if (from == A8 )//|| to == A8)
+        m_Castling &= 0xE;
+    if (from == H8) //|| to == H8)
+        m_Castling &= 0xD;
+    if (from == E1) //|| to == E1)
+        m_Castling &= 0x3;
+    if (from == E8)// || to == E8)
+        m_Castling &= 0xC;
+    m_EnPassant = EMPTY;
+    m_StateKey = m_HashKeys.HashCastling(m_Castling);
+
+    if (m_Side == EColor::BLACK)
+        m_Turns++;
+    m_Plies++;
+
+    if (move.GetCapture() != EPiece::EMPTY) {
+        RemovePiece(to);
+        m_FiftyTurns = 0;
+    }
+
+    if (m_Board[from]->GetPiece() == EPiece::PAWN) {
+        m_FiftyTurns = 0;
+        if (move.IsPawnTwoPush()) {
+            if (move.IsWhiteMove()) {
+                m_EnPassant = from + 10;
+                assert(GetRank(m_EnPassant) == RANK_3);
+            }
+            else {
+                m_EnPassant = from - 10;
+                assert(GetRank(m_EnPassant) == RANK_6);
+            }
+        }
+    }
+
+    MovePiece(from , to);
+
+    if (move.GetPromotion() != EPiece::EMPTY) {
+        RemovePiece(from);
+        AddPiece(to, move.GetPromotion(), move.GetColor());
+    }
+
+    if (m_Board[from]->GetPiece() == EPiece::KING) {
+        if (move.IsWhiteMove()) {
+            m_WhiteKing = to;
+        }
+        else {
+            m_BlackKing = to;
+        }
+    }
+
+    int king;
+    if (m_Side == EColor::WHITE)
+        king = m_WhiteKing;
+    else
+        king = m_BlackKing;
+
+    m_Side = OppositeSide(m_Side);
+    m_StateKey = m_HashKeys.HashSide(m_Side);
+    if (TileAttacked(m_Side,king)) {
+        UndoMove();
+        return false;
+    }
+    return true;
+}
+
+bool CBoard::UndoMove() {
+    if (m_Side == EColor::WHITE)
+        m_Turns--;
+    m_Plies--;
+
+    CHistory undo = m_History[m_Plies];
+    CMove undoMove = undo.m_Move;
+    int from = undoMove.GetFrom();
+    int to = undoMove.GetTo();
+
+    if (m_EnPassant != EMPTY)
+        m_StateKey = m_HashKeys.HashEnPassant(m_EnPassant);
+    m_StateKey = m_HashKeys.HashCastling(m_Castling);
+
+    m_Castling = undo.m_Castling;
+    m_FiftyTurns = undo.m_FiftyTurns;
+    m_EnPassant = undo.m_EnPassant;
+
+    if (m_EnPassant != EMPTY)
+        m_StateKey = m_HashKeys.HashEnPassant(m_EnPassant);
+    m_StateKey = m_HashKeys.HashCastling(m_Castling);
+
+    m_Side = OppositeSide(m_Side);
+    m_StateKey = m_HashKeys.HashSide(m_Side);
+
+    if (undoMove.IsEnPassant()) {
+        if (undoMove.IsWhiteMove())
+            AddPiece(to - 10, EPiece::PAWN, EColor::BLACK);
+        else
+            AddPiece(to + 10, EPiece::PAWN, EColor::WHITE);
+    }
+    else if (undoMove.IsCastling()) {
+        switch (to) {
+            case C1:
+                MovePiece(D1, A1);
+            case C8:
+                MovePiece(D8, A8);
+            case G1:
+                MovePiece(F1, H1);
+            case G8:
+                MovePiece(F8, H8);
+            default:
+                throw std::logic_error("Invalid castling move");
+
+        }
+    }
+
+    MovePiece(to, from);
+
+    if (m_Board[to]->GetPiece() == EPiece::KING) {
+        if (undoMove.IsWhiteMove()) {
+            m_WhiteKing = from;
+        }
+        else {
+            m_BlackKing = from;
+        }
+    }
+
+    if (undoMove.GetCapture() != EPiece::EMPTY) {
+        AddPiece(to, undoMove.GetCapture(), m_Side);
+    }
+
+    if (undoMove.GetPromotion() != EPiece::EMPTY) {
+        RemovePiece(from);
+        AddPiece(from, EPiece::PAWN, m_Side);
+    }
+    return true;
+}
+

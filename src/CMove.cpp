@@ -5,8 +5,10 @@
 
 #include "CMove.h"
 
-CMove::CMove(int from, int to, EPiece capture, bool pawnTwoPush, bool enPassant, EPiece promotion, bool castle, int score)
-: m_From(from), m_To(to), m_Capture(capture), m_PawnTwoPush(pawnTwoPush), m_EnPassant(enPassant), m_Promotion(promotion), m_Castle(castle), m_Score(score) {
+CMove::CMove(EColor color, int from, int to, EPiece capture, bool pawnStart, bool enPassant, EPiece promotion,
+             bool castle,
+             int score)
+: m_From(from), m_To(to), m_Capture(capture), m_PawnTwoPush(pawnStart), m_EnPassant(enPassant), m_Promotion(promotion), m_Castle(castle), m_Score(score) {
 }
 
 std::ostream & CMove::Print(std::ostream & os) const {
@@ -16,31 +18,31 @@ std::ostream & CMove::Print(std::ostream & os) const {
     return os;
 }
 
-CMove PushMove(int from, int to) {
-    return CMove(from, to);
+CMove PushMove(EColor color, int from, int to) {
+    return CMove(color, from, to, EPiece::KING, false, false, EPiece::KING, false, 0);
 }
 
-CMove PromotionMove(int from, int to, EPiece capture, EPiece promotion) {
-    return CMove(from, to, capture, false, false, promotion, false, 0);
+CMove PromotionMove(EColor color, int from, int to, EPiece capture, EPiece promotion) {
+    return CMove(color, from, to, capture, false, false, promotion, false, 0);
 }
 
-CMove PawnTwoForward(int from, int to) {
-    return CMove(from, to, EPiece::EMPTY, true);
+CMove PawnTwoForward(EColor color, int from, int to) {
+    return CMove(color, from, to, EPiece::EMPTY, true, false, EPiece::KING, false, 0);
 }
 
-CMove CaptureMove(int from, int to, EPiece capture, bool enPassant) {
-    return CMove(from, to, capture, enPassant);
+CMove CaptureMove(EColor color, int from, int to, EPiece capture, bool enPassant) {
+    return CMove(color, from, to, capture, enPassant, false, EPiece::KING, false, 0);
 }
 
-CMove CastleMove(int castling) {
+CMove CastleMove(EColor color, int castling) {
     if (castling & WHITE_KING_CASTLE)
-        return CMove(E1, G1, EPiece::EMPTY, false, false, EPiece::EMPTY, true, 0);
+        return CMove(color, E1, G1, EPiece::EMPTY, false, false, EPiece::EMPTY, true, 0);
     else if (castling & WHITE_QUEEN_CASTLE)
-        return CMove(E1, C1, EPiece::EMPTY, false, false, EPiece::EMPTY, true, 0);
+        return CMove(color, E1, C1, EPiece::EMPTY, false, false, EPiece::EMPTY, true, 0);
     else if (castling & BLACK_KING_CASTLE)
-        return CMove(E8, G8, EPiece::EMPTY, false, false, EPiece::EMPTY, true, 0);
+        return CMove(color, E8, G8, EPiece::EMPTY, false, false, EPiece::EMPTY, true, 0);
     else if (castling & BLACK_QUEEN_CASTLE)
-        return CMove(E8, C8, EPiece::EMPTY, false, false, EPiece::EMPTY, true, 0);
+        return CMove(color, E8, C8, EPiece::EMPTY, false, false, EPiece::EMPTY, true, 0);
     else
         throw std::logic_error("Cannot castle");
 }

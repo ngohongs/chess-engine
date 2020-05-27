@@ -24,10 +24,11 @@ std::list<CMove> CKing::MoveList() const {
             continue;
         // Push move
         if (m_Board.IsEmpty(m_Coord + i) && !KingNeighbour(m_Coord + i))
-            moveList.push_back(PushMove(m_Coord, m_Coord + i));
+            moveList.push_back(PushMove(m_Color, m_Coord, m_Coord + i));
         // Capture move
         if (m_Board[m_Coord + i]->GetColor() == oppositeSide)
-            moveList.push_back(CaptureMove(m_Coord, m_Coord + i, m_Board[m_Coord + i]->GetPiece()));
+            moveList.push_back(CaptureMove(m_Color, m_Coord, m_Coord + i, m_Board[m_Coord + i]->GetPiece(),
+                                           false));
     }
 
     if (m_Color == EColor::WHITE) {
@@ -35,7 +36,7 @@ std::list<CMove> CKing::MoveList() const {
             if (!m_LastTurn && m_Board[H1]->GetCode() == R && !m_Board[H1]->GetLastTurn()) {
                 if (m_Board.IsEmpty(F1) && m_Board.IsEmpty(G1)) {
                     if (!m_Board.TileAttacked(EColor::BLACK, E1) && !m_Board.TileAttacked(EColor::BLACK, F1)) {
-                        moveList.push_back(CastleMove(WHITE_KING_CASTLE));
+                        moveList.push_back(CastleMove(EColor::WHITE, WHITE_KING_CASTLE));
                     }
                 }
             }
@@ -44,7 +45,7 @@ std::list<CMove> CKing::MoveList() const {
             if (!m_LastTurn && m_Board[A1]->GetCode() == R && !m_Board[A1]->GetLastTurn()) {
                 if (m_Board.IsEmpty(B1) && m_Board.IsEmpty(C1) && m_Board.IsEmpty(D1)) {
                     if (!m_Board.TileAttacked(EColor::BLACK, D1) && !m_Board.TileAttacked(EColor::BLACK, E1)) {
-                        moveList.push_back(CastleMove(WHITE_QUEEN_CASTLE));
+                        moveList.push_back(CastleMove(EColor::WHITE, WHITE_QUEEN_CASTLE));
                     }
                 }
             }
@@ -55,7 +56,7 @@ std::list<CMove> CKing::MoveList() const {
             if (!m_LastTurn && m_Board[H8]->GetCode() == r && !m_Board[H8]->GetLastTurn()) {
                 if (m_Board.IsEmpty(F8) && m_Board.IsEmpty(G8)) {
                     if (!m_Board.TileAttacked(EColor::WHITE, E8) && !m_Board.TileAttacked(EColor::WHITE, F8)) {
-                        moveList.push_back(CastleMove(BLACK_KING_CASTLE));
+                        moveList.push_back(CastleMove(EColor::BLACK, BLACK_KING_CASTLE));
                     }
                 }
             }
@@ -64,7 +65,7 @@ std::list<CMove> CKing::MoveList() const {
             if (!m_LastTurn && m_Board[A8]->GetCode() == r && !m_Board[A8]->GetLastTurn()) {
                 if (m_Board.IsEmpty(B8) && m_Board.IsEmpty(C8) && m_Board.IsEmpty(D8)) {
                     if (!m_Board.TileAttacked(EColor::WHITE, D8) && !m_Board.TileAttacked(EColor::WHITE, E8)) {
-                        moveList.push_back(CastleMove(BLACK_QUEEN_CASTLE));
+                        moveList.push_back(CastleMove(EColor::BLACK, BLACK_QUEEN_CASTLE));
                     }
                 }
             }
