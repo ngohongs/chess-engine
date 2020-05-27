@@ -15,7 +15,7 @@ CBoard::CBoard() {
     assert(CreateFEN() == START_FEN);
     m_StateKey = m_HashKeys.GenerateStateKey(m_Board, m_Side, m_Castling, m_EnPassant);
     UpdateScore();
-    GenerateAllMoves(EColor::BLACK);
+    GenerateAllMoves(m_Side);
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
