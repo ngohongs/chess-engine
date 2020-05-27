@@ -6,7 +6,7 @@
 #pragma once
 
 
-const char * const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+const char * const START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1";
 
 enum {p, n, b, r, q , k, P, N, B, R, Q, K, EMPTY};
 

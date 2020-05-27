@@ -48,14 +48,12 @@ uint64_t CHashKey::HashPiece(int pieceCode, int tile) {
     return m_StateKey ^= m_PiecesKeys[pieceCode][tile];
 }
 
-uint64_t CHashKey::HashCastling(int castling) {
+uint64_t CHashKey::HashCastling(unsigned int castling) {
     return m_StateKey ^= m_CastlingKeys[castling];
 }
 
 uint64_t CHashKey::HashSide(EColor color) {
-    if (color == EColor::WHITE)
-        return m_StateKey ^= m_WhiteTurnKey;
-    return m_StateKey;
+    return m_StateKey ^= m_WhiteTurnKey;
 }
 
 uint64_t CHashKey::HashEnPassant(int tile) {

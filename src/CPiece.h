@@ -53,6 +53,8 @@ public:
     }
 
     size_t GetLastTurn() const;
+
+    void SetCoord(int index);
 };
 
 

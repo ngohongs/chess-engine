@@ -11,7 +11,7 @@ struct CHistory {
     CHistory() {}
 
     CMove m_Move;
-    int m_Castling;
+    unsigned int m_Castling;
     int m_EnPassant;
     int m_FiftyTurns;
     uint64_t m_StateKey;

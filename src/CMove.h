@@ -46,11 +46,11 @@ public:
         return m_Side == EColor::WHITE;
     }
 
-    bool GetFrom() const {
+    int GetFrom() const {
         return m_From;
     }
 
-    bool GetTo() const {
+    int GetTo() const {
         return m_To;
     }
 

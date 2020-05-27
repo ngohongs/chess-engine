@@ -28,7 +28,7 @@ public:
 
     uint64_t HashPiece(int pieceCode, int tile);
 
-    uint64_t HashCastling(int castling);
+    uint64_t HashCastling(unsigned int castling);
 
     uint64_t HashSide(EColor color);
 

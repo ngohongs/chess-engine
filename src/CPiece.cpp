@@ -22,3 +22,7 @@ size_t CPiece::GetLastTurn() const {
     return m_LastTurn;
 }
 
+void CPiece::SetCoord(int index) {
+    m_Coord = index;
+}
+

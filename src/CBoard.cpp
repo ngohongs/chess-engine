@@ -1,4 +1,5 @@
 #include <climits>
+#include <iomanip>
 /*
  * @author Hong Son Ngo <ngohongs@fit.cvut.cz>
  * @date 14/05/2020.
@@ -10,10 +11,11 @@ CBoard::CBoard() {
     for (int i = 0; i < 120; i++)
         m_Board[i] = std::make_shared<COffboard>(COffboard(*this, i));
 
-    ReadFEN(CASTLEMOVE2);
-    assert(CreateFEN() == CASTLEMOVE2);
+    ReadFEN(START_FEN);
+    assert(CreateFEN() == START_FEN);
     m_StateKey = m_HashKeys.GenerateStateKey(m_Board, m_Side, m_Castling, m_EnPassant);
-
+    UpdateScore();
+    GenerateAllMoves(EColor::BLACK);
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
@@ -204,7 +206,10 @@ bool CBoard::ReadFEN(const std::string & fen) {
 }
 
 void CBoard::PrintState() const {
+    int rank = -1;
+    std::cout << "   -ABCDEFGH-" << std::endl;
     for (int i = 0; i < 12; i++) {
+        std::cout << std::setw(2) << rank++ << " ";
         for (int j = 0; j < 10; j++) {
             m_Board[i * 10 + j]->Print(std::cout);
         }
@@ -215,6 +220,7 @@ void CBoard::PrintState() const {
     std::cout << "Castling: " << (m_Castling & 0x8U ? "K" : "") << (m_Castling & 0x4U ? "Q" : "")
                               << (m_Castling & 0x2U ? "k" : "") << (m_Castling & 0x1U ? "q" : "")
                               << (!m_Castling ? "-" : "") << std::endl;
+    std::cout << "Key: " << std::hex << m_StateKey << std::dec << std::endl;
 }
 
 std::string CBoard::CreateFEN() const {
@@ -361,7 +367,7 @@ int CBoard::GetEnPassant() const {
     return m_EnPassant;
 }
 
-__unused std::list<CMove> CBoard::GenerateAllMoves(EColor side) const {
+std::list<CMove> CBoard::GenerateAllMoves(EColor side) {
     std::list<CMove> moveList;
     int count = 0;
     if (side == EColor::WHITE)
@@ -371,14 +377,46 @@ __unused std::list<CMove> CBoard::GenerateAllMoves(EColor side) const {
         for (const auto & i : m_BlackPieces)
             moveList.splice(moveList.end(), i->MoveList());
 
+//    for (const auto & i : m_BlackPieces) {
+//        std::cout << std::endl;
+//    }
+//    for (const auto & i : moveList) {
+//       std::cout << std::endl;
+//    }
+    std::cout << "BEFORE: " << std::endl;
+    PrintState();
+    std::cout << std::endl;
+    getchar();
 
     for (const auto & i : moveList) {
-        std::cout << "move #" << ++count << "\t";
+//        std::cout << count << std::endl;
+//        i.Print(std::cout);
+//        std::cout << std::endl;
+
+        if (!MakeMove(i)) {
+            getchar();
+            continue;
+        }
+
+        std::cout << "MOVE #" << ++count << " ";
         i.Print(std::cout);
         std::cout << std::endl;
+        PrintState();
+
+        std::cout << std::endl << std::endl;
+
+        UndoMove();
+
+        std::cout << "UNDO #" << count << " ";
+        i.Print(std::cout);
+        std::cout << std::endl;
+        PrintState();
+
+
+        std::cout << std::endl << std::endl;
+        getchar();
     }
     std::cout << "Total moves: " << count << std::endl;
-
     return moveList;
 }
 
@@ -389,8 +427,11 @@ unsigned int CBoard::GetCastling() const {
 bool CBoard::RemovePiece(int index) {
     EColor targetColor = m_Board[index]->GetColor();
     int targetCode = m_Board[index]->GetCode();
-    if (IsOffboard(index) || IsEmpty(index))
-        throw std::logic_error("Cannot remove piece offboard or empty piece");
+    if (IsOffboard(index) || IsEmpty(index)) {
+        std::cout << "asdas:" << index << std::endl;
+        assert(false);
+//        throw std::logic_error("Cannot remove piece offboard or empty piece");
+    }
 
     if (targetColor == EColor::WHITE) {
         m_WhitePieces.remove(m_Board[index]);
@@ -407,6 +448,7 @@ bool CBoard::RemovePiece(int index) {
 }
 
 bool CBoard::AddPiece(int index, EPiece piece, EColor color) {
+    assert(m_Board[index]->GetPiece() == EPiece::EMPTY);
     std::shared_ptr<CPiece> target;
     if (piece == EPiece::PAWN)
         target = std::make_shared<CPawn>(CPawn(*this, index, color));
@@ -452,39 +494,55 @@ void CBoard::UpdateScore() {
 
 bool CBoard::MovePiece(int from, int to) {
     int pieceToMoveCode = m_Board[from]->GetCode();
-    if (IsOffboard(from) || IsOffboard(to))
+    if (IsOffboard(from) || IsOffboard(to) || !IsEmpty(to))
         throw std::logic_error("Cannot move from || to offboard piece");
 
     m_StateKey = m_HashKeys.HashPiece(pieceToMoveCode, from);
+    m_Board[from]->SetCoord(to);
+    m_Board[to] = m_Board[from];
     m_Board[from] = std::make_shared<CEmpty>(CEmpty(*this, from));
-
     m_StateKey = m_HashKeys.HashPiece(pieceToMoveCode, to);
     return true;
 }
 
 bool CBoard::MakeMove(const CMove & move) {
-    CHistory targetMove;
-    targetMove.m_StateKey = m_StateKey;
+    CHistory undo;
+    undo.m_StateKey = m_StateKey;
+    m_History.push_back(undo);
+
     int from = move.GetFrom();
     int to = move.GetTo();
-    m_History.push_back(targetMove);
+
+    if (m_Board[from]->GetPiece() == EPiece::KING) {
+        if (move.IsWhiteMove()) {
+            m_WhiteKing = to;
+        }
+        else {
+            m_BlackKing = to;
+        }
+    }
 
     if (move.IsEnPassant()) {
         if (move.IsWhiteMove())
-            RemovePiece(move.GetTo() - 10);
+            RemovePiece(to - 10);
         else
-            RemovePiece(move.GetTo() + 10);
+            RemovePiece(to + 10);
     }
-    else if (move.IsCastling()) {
+
+    if (move.IsCastling()) {
         switch (to) {
             case C1:
                 MovePiece(A1, D1);
+                break;
             case C8:
                 MovePiece(A8, D8);
+                break;
             case G1:
                 MovePiece(H1, F1);
+                break;
             case G8:
                 MovePiece(H8, F8);
+                break;
             default:
                 throw std::logic_error("Invalid castling move");
 
@@ -494,29 +552,32 @@ bool CBoard::MakeMove(const CMove & move) {
         m_StateKey = m_HashKeys.HashEnPassant(m_EnPassant);
     m_StateKey = m_HashKeys.HashCastling(m_Castling);
 
-    targetMove.m_Move = move;
-    targetMove.m_FiftyTurns = m_FiftyTurns;
-    targetMove.m_EnPassant = m_EnPassant;
-    targetMove.m_Castling = m_Castling;
+    m_History[m_Plies].m_Move = move;
+    m_History[m_Plies].m_FiftyTurns = m_FiftyTurns;
+    m_History[m_Plies].m_EnPassant = m_EnPassant;
+    m_History[m_Plies].m_Castling = m_Castling;
 
 
-    if (from == A1 )//|| to == A1)
+    if (from == A1 || to == A1)
         m_Castling &= 0xB;
-    if (from == H1 )//|| to == H1)
+    if (from == H1 || to == H1)
         m_Castling &= 0x7;
-    if (from == A8 )//|| to == A8)
+    if (from == A8 || to == A8)
         m_Castling &= 0xE;
-    if (from == H8) //|| to == H8)
+    if (from == H8 || to == H8)
         m_Castling &= 0xD;
-    if (from == E1) //|| to == E1)
+    if (from == E1 || to == E1)
         m_Castling &= 0x3;
-    if (from == E8)// || to == E8)
+    if (from == E8 || to == E8)
         m_Castling &= 0xC;
     m_EnPassant = EMPTY;
+
     m_StateKey = m_HashKeys.HashCastling(m_Castling);
 
-    if (m_Side == EColor::BLACK)
+    if (m_Side == EColor::BLACK) {
         m_Turns++;
+        m_FiftyTurns++;
+    }
     m_Plies++;
 
     if (move.GetCapture() != EPiece::EMPTY) {
@@ -535,24 +596,18 @@ bool CBoard::MakeMove(const CMove & move) {
                 m_EnPassant = from - 10;
                 assert(GetRank(m_EnPassant) == RANK_6);
             }
+            m_StateKey = m_HashKeys.HashEnPassant(m_EnPassant);
         }
     }
 
     MovePiece(from , to);
 
     if (move.GetPromotion() != EPiece::EMPTY) {
-        RemovePiece(from);
+        RemovePiece(to);
         AddPiece(to, move.GetPromotion(), move.GetColor());
     }
 
-    if (m_Board[from]->GetPiece() == EPiece::KING) {
-        if (move.IsWhiteMove()) {
-            m_WhiteKing = to;
-        }
-        else {
-            m_BlackKing = to;
-        }
-    }
+
 
     int king;
     if (m_Side == EColor::WHITE)
@@ -562,6 +617,7 @@ bool CBoard::MakeMove(const CMove & move) {
 
     m_Side = OppositeSide(m_Side);
     m_StateKey = m_HashKeys.HashSide(m_Side);
+
     if (TileAttacked(m_Side,king)) {
         UndoMove();
         return false;
@@ -600,7 +656,7 @@ bool CBoard::UndoMove() {
         else
             AddPiece(to + 10, EPiece::PAWN, EColor::WHITE);
     }
-    else if (undoMove.IsCastling()) {
+    if (undoMove.IsCastling()) {
         switch (to) {
             case C1:
                 MovePiece(D1, A1);
@@ -618,7 +674,7 @@ bool CBoard::UndoMove() {
 
     MovePiece(to, from);
 
-    if (m_Board[to]->GetPiece() == EPiece::KING) {
+    if (m_Board[from]->GetPiece() == EPiece::KING) {
         if (undoMove.IsWhiteMove()) {
             m_WhiteKing = from;
         }
@@ -628,7 +684,7 @@ bool CBoard::UndoMove() {
     }
 
     if (undoMove.GetCapture() != EPiece::EMPTY) {
-        AddPiece(to, undoMove.GetCapture(), m_Side);
+        AddPiece(to, undoMove.GetCapture(), OppositeSide(m_Side));
     }
 
     if (undoMove.GetPromotion() != EPiece::EMPTY) {

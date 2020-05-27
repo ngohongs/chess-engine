@@ -77,7 +77,7 @@ public:
 
     std::shared_ptr<CPiece> & operator[](int index);
 
-    std::list<CMove> GenerateAllMoves(EColor side) const;
+    std::list<CMove> GenerateAllMoves(EColor side);
 
     bool RemovePiece(int index);
 
