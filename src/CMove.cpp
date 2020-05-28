@@ -12,9 +12,26 @@ CMove::CMove(EColor color, int from, int to, EPiece capture, bool pawnStart, boo
 }
 
 std::ostream & CMove::Print(std::ostream & os) const {
+    os << (m_Side == EColor::WHITE ? 'w' : 'b');
     os << IndexToTile(m_From) << IndexToTile(m_To);
     if (m_Promotion != EPiece::EMPTY)
         os << m_Promotion;
+    else
+        os << '-';
+
+    if (m_Capture != EPiece::EMPTY)
+        os << m_Capture;
+    else
+        os << '-';
+
+    os << (m_Castle ? 'C' : '-' );
+    os << (m_PawnTwoPush ? '2' : '-');
+    os << (m_EnPassant ? 'E' : '-');
+    return os;
+}
+
+std::ostream & operator<<(std::ostream & os, const CMove & self) {
+    self.Print(os);
     return os;
 }
 
@@ -31,7 +48,7 @@ CMove PawnTwoForward(EColor color, int from, int to) {
 }
 
 CMove CaptureMove(EColor color, int from, int to, EPiece capture, bool enPassant) {
-    return CMove(color, from, to, capture, enPassant, false, EPiece::EMPTY, false, 0);
+    return CMove(color, from, to, capture, false, enPassant, EPiece::EMPTY, false, 100);
 }
 
 CMove CastleMove(EColor color, int castling) {

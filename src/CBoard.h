@@ -57,7 +57,10 @@ private:
     int m_WhiteScore;
     int m_BlackScore;
 
+    // TODO Better indexing for history, when loading with FEN with different ply than 0
     std::vector<CHistory> m_History;
+
+    int m_PiecesCount[13] = {};
 public:
     CBoard();
 
@@ -87,12 +90,20 @@ public:
 
     bool MakeMove(const CMove & move);
 
+    std::list<CMove> GenerateMovesForSide();
+
+    void Perft(int depth, uint64_t & leafNodes);
+
+    void PerftTest(int depth);
+    void PerftRootTest(int depth, uint64_t & leafNodes);
+
     bool UndoMove();
     int GetEnPassant() const;
     unsigned int GetCastling() const;
     bool IsEmpty(int index) const;
     bool IsOffboard(int index) const;
     void UpdateScore();
+    void PrintPieceNumTable() const;
 };
 
 

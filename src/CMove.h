@@ -30,6 +30,8 @@ public:
 
     std::ostream & Print(std::ostream & os) const;
 
+    friend std::ostream & operator<<(std::ostream & os, const CMove & self);
+
     bool IsEnPassant() const {
         return m_EnPassant;
     }

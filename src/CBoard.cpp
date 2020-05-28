@@ -7,15 +7,26 @@
 
 #include "CBoard.h"
 
+uint64_t CaptureCount = 0;
+uint64_t EnPassantCount = 0;
+uint64_t PushCount = 0;
+uint64_t CheckCount = 0;
+
 CBoard::CBoard() {
     for (int i = 0; i < 120; i++)
         m_Board[i] = std::make_shared<COffboard>(COffboard(*this, i));
 
     ReadFEN(START_FEN);
-    assert(CreateFEN() == START_FEN);
+    assert(START_FEN == CreateFEN());
     m_StateKey = m_HashKeys.GenerateStateKey(m_Board, m_Side, m_Castling, m_EnPassant);
     UpdateScore();
-    GenerateAllMoves(m_Side);
+//    std::cout << TileAttacked(OppositeSide(m_Side), G1) << std::endl;
+//    TilesAttackedBy(OppositeSide(m_Side));
+    PerftTest(6);
+//    std::cout << "Capture: " << CaptureCount << std::endl;
+//    std::cout << "EnPassant: " << EnPassantCount << std::endl;
+//    std::cout << "Push: " << PushCount << std::endl;
+//    std::cout << "CheckCount: " << CheckCount << std::endl;
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
@@ -55,30 +66,40 @@ bool CBoard::ReadFEN(const std::string & fen) {
                 case 'P':
                     m_Board[position] = std::make_shared<CPawn>(CPawn(*this, position, EColor::WHITE));
                     m_WhitePieces.push_back(m_Board[position]);
+                    if (++(m_PiecesCount[P]) > 10)
+                        return false;
                     position++;
                     file++;
                     break;
                 case 'N':
                     m_Board[position] = std::make_shared<CKnight>(CKnight(*this, position, EColor::WHITE));
                     m_WhitePieces.push_back(m_Board[position]);
+                    if (++(m_PiecesCount[N]) > 10)
+                        return false;
                     position++;
                     file++;
                     break;
                 case 'B':
                     m_Board[position] = std::make_shared<CBishop>(CBishop(*this, position, EColor::WHITE));
                     m_WhitePieces.push_back(m_Board[position]);
+                    if (++(m_PiecesCount[B]) > 10)
+                        return false;
                     position++;
                     file++;
                     break;
                 case 'R':
                     m_Board[position] = std::make_shared<CRook>(CRook(*this, position, EColor::WHITE));
                     m_WhitePieces.push_back(m_Board[position]);
+                    if (++(m_PiecesCount[R]) > 10)
+                        return false;
                     position++;
                     file++;
                     break;
                 case 'Q':
                     m_Board[position] = std::make_shared<CQueen>(CQueen(*this, position, EColor::WHITE));
                     m_WhitePieces.push_back(m_Board[position]);
+                    if (++(m_PiecesCount[Q]) > 10)
+                        return false;
                     position++;
                     file++;
                     break;
@@ -86,6 +107,8 @@ bool CBoard::ReadFEN(const std::string & fen) {
                     m_Board[position] = std::make_shared<CKing>(CKing(*this, position, EColor::WHITE));
                     m_WhitePieces.push_back(m_Board[position]);
                     m_WhiteKing = position;
+                    if (++(m_PiecesCount[K]) > 1)
+                        return false;
                     position++;
                     file++;
                     break;
@@ -93,30 +116,40 @@ bool CBoard::ReadFEN(const std::string & fen) {
                 case 'p':
                     m_Board[position] = std::make_shared<CPawn>(CPawn(*this, position, EColor::BLACK));
                     m_BlackPieces.push_back(m_Board[position]);
+                    if (++(m_PiecesCount[p]) > 10)
+                        return false;
                     position++;
                     file++;
                     break;
                 case 'n':
                     m_Board[position] = std::make_shared<CKnight>(CKnight(*this, position, EColor::BLACK));
                     m_BlackPieces.push_back(m_Board[position]);
+                    if (++(m_PiecesCount[n]) > 10)
+                        return false;
                     position++;
                     file++;
                     break;
                 case 'b':
                     m_Board[position] = std::make_shared<CBishop>(CBishop(*this, position, EColor::BLACK));
                     m_BlackPieces.push_back(m_Board[position]);
+                    if (++(m_PiecesCount[b]) > 10)
+                        return false;
                     position++;
                     file++;
                     break;
                 case 'r':
                     m_Board[position] = std::make_shared<CRook>(CRook(*this, position, EColor::BLACK));
                     m_BlackPieces.push_back(m_Board[position]);
+                    if (++(m_PiecesCount[r]) > 10)
+                        return false;
                     position++;
                     file++;
                     break;
                 case 'q':
                     m_Board[position] = std::make_shared<CQueen>(CQueen(*this, position, EColor::BLACK));
                     m_BlackPieces.push_back(m_Board[position]);
+                    if (++(m_PiecesCount[q]) > 10)
+                        return false;
                     position++;
                     file++;
                     break;
@@ -124,6 +157,8 @@ bool CBoard::ReadFEN(const std::string & fen) {
                     m_Board[position] = std::make_shared<CKing>(CKing(*this, position, EColor::BLACK));
                     m_BlackPieces.push_back(m_Board[position]);
                     m_BlackKing = position;
+                    if (++(m_PiecesCount[k]) > 10)
+                        return false;
                     position++;
                     file++;
                     break;
@@ -206,16 +241,17 @@ bool CBoard::ReadFEN(const std::string & fen) {
 }
 
 void CBoard::PrintState() const {
-    int rank = -1;
-    std::cout << "   -ABCDEFGH-" << std::endl;
-    for (int i = 0; i < 12; i++) {
-        std::cout << std::setw(2) << rank++ << " ";
-        for (int j = 0; j < 10; j++) {
-            m_Board[i * 10 + j]->Print(std::cout);
-        }
-        std::cout << '\n';
-    }
-    std::cout << "side: " << (m_Side == EColor::WHITE ? 'w' : 'b') << std::endl;
+//    int rank = -1;
+//    std::cout << "   -ABCDEFGH-" << std::endl;
+//    for (int i = 0; i < 12; i++) {
+//        std::cout << std::setw(2) << rank++ << " ";
+//        for (int j = 0; j < 10; j++) {
+//            m_Board[i * 10 + j]->Print(std::cout);
+//        }
+//        std::cout << '\n';
+//    }
+    Print(std::cout);
+    std::cout << "side: " << (m_Side != EColor::WHITE ? 'w' : 'b') << std::endl;
     std::cout << "En Passant: " << IndexToTile(m_EnPassant) << std::endl;
     std::cout << "Castling: " << (m_Castling & 0x8U ? "K" : "") << (m_Castling & 0x4U ? "Q" : "")
                               << (m_Castling & 0x2U ? "k" : "") << (m_Castling & 0x1U ? "q" : "")
@@ -274,6 +310,7 @@ std::string CBoard::CreateFEN() const {
 
 bool CBoard::TileAttacked(EColor attacker, int tile) const {
     // Pawn attacking
+//    EColor attacker = OppositeSide(m_Side);
     if (attacker == EColor::WHITE) {
         if (m_Board[tile - 9]->GetCode() == P || m_Board[tile - 11]->GetCode() == P)
             return true;
@@ -312,11 +349,15 @@ bool CBoard::TileAttacked(EColor attacker, int tile) const {
         while (!IsOffboard(tempTile)) {
             piece = m_Board[tempTile]->GetPiece();
             color = m_Board[tempTile]->GetColor();
+//            std::cout << IndexToTile(tempTile) << " ";
             if (piece != EPiece::EMPTY) {
-                if ((piece == EPiece::ROOK || piece == EPiece::QUEEN) && color == attacker)
+                if ((piece == EPiece::BISHOP || piece == EPiece::QUEEN) && color == attacker)
+//                    std::cout << "YES" << std::endl;
                     return true;
+//                    std::cout << std::endl;
                 break;
             }
+//            std::cout << std::endl;
             tempTile += i;
         }
     }
@@ -367,6 +408,7 @@ int CBoard::GetEnPassant() const {
     return m_EnPassant;
 }
 
+// TODO count pieces for GenerateAllMoves, possibility of skipping this
 std::list<CMove> CBoard::GenerateAllMoves(EColor side) {
     std::list<CMove> moveList;
     int count = 0;
@@ -427,8 +469,13 @@ unsigned int CBoard::GetCastling() const {
 bool CBoard::RemovePiece(int index) {
     EColor targetColor = m_Board[index]->GetColor();
     int targetCode = m_Board[index]->GetCode();
+    if (--(m_PiecesCount[targetCode]) < 0)
+        throw std::logic_error("CANNOT DELETE THIS");
+
     if (IsOffboard(index) || IsEmpty(index)) {
-        std::cout << "asdas:" << index << std::endl;
+        std::cout << CreateFEN() << std::endl;
+        std::cout << "STOP HERE" << std::endl;
+        PrintState();
         assert(false);
 //        throw std::logic_error("Cannot remove piece offboard or empty piece");
     }
@@ -464,6 +511,10 @@ bool CBoard::AddPiece(int index, EPiece piece, EColor color) {
         target = std::make_shared<CKing>(CKing(*this, index, color));
     else
         throw std::logic_error("Cannot add empty or offboard piece");
+    m_Board[index] = target;
+
+    if (++(m_PiecesCount[target->GetCode()]) > 10)
+        throw std::logic_error("CANNOT ADD MORE PIECES");
 
     m_StateKey = m_HashKeys.HashPiece(target->GetCode(), index);
 
@@ -475,7 +526,6 @@ bool CBoard::AddPiece(int index, EPiece piece, EColor color) {
         m_BlackPieces.push_back(target);
         m_BlackScore += PIECE_SCORE[target->GetCode()];
     }
-
     return true;
 }
 
@@ -494,8 +544,12 @@ void CBoard::UpdateScore() {
 
 bool CBoard::MovePiece(int from, int to) {
     int pieceToMoveCode = m_Board[from]->GetCode();
-    if (IsOffboard(from) || IsOffboard(to) || !IsEmpty(to))
-        throw std::logic_error("Cannot move from || to offboard piece");
+    if (IsOffboard(from) || IsOffboard(to) || !IsEmpty(to)) {
+        PrintState();
+        std::cout << "Cannot move from || to offboard piece" << std::endl;
+        PrintPieceNumTable();
+        assert(false);
+    }
 
     m_StateKey = m_HashKeys.HashPiece(pieceToMoveCode, from);
     m_Board[from]->SetCoord(to);
@@ -580,7 +634,7 @@ bool CBoard::MakeMove(const CMove & move) {
     }
     m_Plies++;
 
-    if (move.GetCapture() != EPiece::EMPTY) {
+    if (move.GetCapture() != EPiece::EMPTY && !move.IsEnPassant()) {
         RemovePiece(to);
         m_FiftyTurns = 0;
     }
@@ -660,12 +714,16 @@ bool CBoard::UndoMove() {
         switch (to) {
             case C1:
                 MovePiece(D1, A1);
+                break;
             case C8:
                 MovePiece(D8, A8);
+                break;
             case G1:
                 MovePiece(F1, H1);
+                break;
             case G8:
                 MovePiece(F8, H8);
+                break;
             default:
                 throw std::logic_error("Invalid castling move");
 
@@ -683,7 +741,7 @@ bool CBoard::UndoMove() {
         }
     }
 
-    if (undoMove.GetCapture() != EPiece::EMPTY) {
+    if (undoMove.GetCapture() != EPiece::EMPTY && !undoMove.IsEnPassant()) {
         AddPiece(to, undoMove.GetCapture(), OppositeSide(m_Side));
     }
 
@@ -692,5 +750,93 @@ bool CBoard::UndoMove() {
         AddPiece(from, EPiece::PAWN, m_Side);
     }
     return true;
+}
+
+std::list<CMove> CBoard::GenerateMovesForSide() {
+    std::list<CMove> moveList;
+    if (m_Side == EColor::WHITE)
+        for (const auto & i : m_WhitePieces)
+            moveList.splice(moveList.end(), i->MoveList());
+    else
+        for (const auto & i : m_BlackPieces)
+            moveList.splice(moveList.end(), i->MoveList());
+
+    return moveList;
+}
+
+void CBoard::Perft(int depth, uint64_t & leafNodes) {
+    std::ostringstream os;
+    std::list<CMove> moveList = GenerateMovesForSide();
+    if (!depth) {
+        leafNodes++;
+        return;
+    }
+
+    for (const auto & i : moveList) {
+//        std::cout << "//////////////////////////////////////////" << std::endl;
+//        std::cout << "BEFORE: " << i << std::endl;
+//        PrintState();
+//        std::cout << std::endl;
+
+        if (!MakeMove(i)) {
+//            std::cout << "ILLEGAL MOVE" << std::endl;
+//            std::cout << "//////////////////////////////////////////" << std::endl;
+            continue;
+        }
+        if (i.IsEnPassant())
+            EnPassantCount++;
+        else if (i.GetCapture() == EPiece::OFFBOARD)
+            assert(false);
+        else if (i.GetCapture() != EPiece::EMPTY)
+            CaptureCount++;
+        else
+            PushCount++;
+
+//        std::cout << "depth: " << depth << ",move: " << i << " --------------------------" << std::endl;
+//        PrintState();
+//        std::cout << "//////////////////////////////////////////" << std::endl << std::endl << std::endl;
+        Perft(depth - 1, leafNodes);
+        UndoMove();
+    }
+    return;
+}
+
+void CBoard::PerftRootTest(int depth, uint64_t & leafNodes) {
+    std::list<CMove> moveList = GenerateMovesForSide();
+
+    for (const auto & i : moveList) {
+        if (!MakeMove(i)) {
+//            CheckCount++;
+            continue;
+        }
+
+        if (i.IsEnPassant())
+            EnPassantCount++;
+        else if (i.GetCapture() != EPiece::EMPTY)
+            CaptureCount++;
+        else
+            PushCount++;
+
+        uint64_t currentLeafNodes = leafNodes;
+        Perft(depth - 1, leafNodes);
+        UndoMove();
+        uint64_t moveLeafNodes = leafNodes - currentLeafNodes;
+        std::cout << "move: " << i << " ,leaf nodes for this move " << moveLeafNodes << std::endl;
+    }
+    return;
+}
+
+void CBoard::PerftTest(int depth) {
+    uint64_t leafNodes = 0;
+    Perft(depth, leafNodes);
+    std::cout << "Total leaf nodes: " << leafNodes << std::endl;
+
+}
+
+void CBoard::PrintPieceNumTable() const {
+    std::cout << "'p, n, b, r, q, k, P, N, B, R, Q, K, ' '" << std::endl;
+    for (const auto & i : m_PiecesCount)
+        std::cout << " " << i << "|";
+    std::cout << std::endl;
 }
 
