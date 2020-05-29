@@ -32,6 +32,10 @@ public:
 
     friend std::ostream & operator<<(std::ostream & os, const CMove & self);
 
+    friend std::istream & operator>>(std::istream & is, CMove & self);
+
+    bool operator==(const CMove & other) const;
+
     bool IsEnPassant() const {
         return m_EnPassant;
     }
@@ -67,6 +71,8 @@ public:
     EColor GetColor() const {
         return m_Side;
     }
+
+    bool IsValid() const;
 };
 
 CMove PushMove(EColor color, int from, int to);

@@ -80,7 +80,7 @@ public:
 
     std::shared_ptr<CPiece> & operator[](int index);
 
-    std::list<CMove> GenerateAllMoves(EColor side);
+//    std::list<CMove> GenerateAllMoves(EColor side);
 
     bool RemovePiece(int index);
 
@@ -104,6 +104,9 @@ public:
     bool IsOffboard(int index) const;
     void UpdateScore();
     void PrintPieceNumTable() const;
+    EColor GetSide() const {
+        return m_Side;
+    }
 };
 
 

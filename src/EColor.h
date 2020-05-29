@@ -6,7 +6,7 @@
 #pragma once
 
 #include <stdexcept>
-
+#include <iostream>
 
 enum class EColor : char {
     WHITE = 'W',
@@ -16,4 +16,4 @@ enum class EColor : char {
 
 EColor OppositeSide(EColor self);
 
-
+std::ostream & operator<<(std::ostream & os, EColor color);

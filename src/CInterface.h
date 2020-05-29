@@ -10,7 +10,7 @@
 #include <string>
 #include <limits>
 #include <functional>
-
+#include "CMove.h"
 
 class CInterface {
 private:
@@ -23,8 +23,11 @@ public:
     void PromptMessage(const std::string & message);
 
     std::ostream & GetOstream() const;
+    std::istream & GetIstream() const;
 
     std::string PromptCommand(const std::function<bool (const std::string &)> &valid);
+
+    CMove PromptMove();
 
     void Clear();
 };

@@ -16,17 +16,11 @@ CBoard::CBoard() {
     for (int i = 0; i < 120; i++)
         m_Board[i] = std::make_shared<COffboard>(COffboard(*this, i));
 
-    ReadFEN(START_FEN);
-    assert(START_FEN == CreateFEN());
+    ReadFEN(PERFT6);
+    assert(PERFT6 == CreateFEN());
     m_StateKey = m_HashKeys.GenerateStateKey(m_Board, m_Side, m_Castling, m_EnPassant);
     UpdateScore();
-//    std::cout << TileAttacked(OppositeSide(m_Side), G1) << std::endl;
-//    TilesAttackedBy(OppositeSide(m_Side));
-    PerftTest(6);
-//    std::cout << "Capture: " << CaptureCount << std::endl;
-//    std::cout << "EnPassant: " << EnPassantCount << std::endl;
-//    std::cout << "Push: " << PushCount << std::endl;
-//    std::cout << "CheckCount: " << CheckCount << std::endl;
+//    PerftTest(3);
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
@@ -408,60 +402,6 @@ int CBoard::GetEnPassant() const {
     return m_EnPassant;
 }
 
-// TODO count pieces for GenerateAllMoves, possibility of skipping this
-std::list<CMove> CBoard::GenerateAllMoves(EColor side) {
-    std::list<CMove> moveList;
-    int count = 0;
-    if (side == EColor::WHITE)
-        for (const auto & i : m_WhitePieces)
-            moveList.splice(moveList.end(), i->MoveList());
-    else
-        for (const auto & i : m_BlackPieces)
-            moveList.splice(moveList.end(), i->MoveList());
-
-//    for (const auto & i : m_BlackPieces) {
-//        std::cout << std::endl;
-//    }
-//    for (const auto & i : moveList) {
-//       std::cout << std::endl;
-//    }
-    std::cout << "BEFORE: " << std::endl;
-    PrintState();
-    std::cout << std::endl;
-    getchar();
-
-    for (const auto & i : moveList) {
-//        std::cout << count << std::endl;
-//        i.Print(std::cout);
-//        std::cout << std::endl;
-
-        if (!MakeMove(i)) {
-            getchar();
-            continue;
-        }
-
-        std::cout << "MOVE #" << ++count << " ";
-        i.Print(std::cout);
-        std::cout << std::endl;
-        PrintState();
-
-        std::cout << std::endl << std::endl;
-
-        UndoMove();
-
-        std::cout << "UNDO #" << count << " ";
-        i.Print(std::cout);
-        std::cout << std::endl;
-        PrintState();
-
-
-        std::cout << std::endl << std::endl;
-        getchar();
-    }
-    std::cout << "Total moves: " << count << std::endl;
-    return moveList;
-}
-
 unsigned int CBoard::GetCastling() const {
     return m_Castling;
 }
@@ -756,17 +696,17 @@ std::list<CMove> CBoard::GenerateMovesForSide() {
     std::list<CMove> moveList;
     if (m_Side == EColor::WHITE)
         for (const auto & i : m_WhitePieces)
-            moveList.splice(moveList.end(), i->MoveList());
+            moveList.splice(moveList.end(), std::move(i->MoveList()));
     else
         for (const auto & i : m_BlackPieces)
-            moveList.splice(moveList.end(), i->MoveList());
+            moveList.splice(moveList.end(), std::move(i->MoveList()));
 
     return moveList;
 }
 
 void CBoard::Perft(int depth, uint64_t & leafNodes) {
     std::ostringstream os;
-    std::list<CMove> moveList = GenerateMovesForSide();
+    std::list<CMove> moveList = std::move(GenerateMovesForSide());
     if (!depth) {
         leafNodes++;
         return;
@@ -802,7 +742,7 @@ void CBoard::Perft(int depth, uint64_t & leafNodes) {
 }
 
 void CBoard::PerftRootTest(int depth, uint64_t & leafNodes) {
-    std::list<CMove> moveList = GenerateMovesForSide();
+    std::list<CMove> moveList = std::move(GenerateMovesForSide());
 
     for (const auto & i : moveList) {
         if (!MakeMove(i)) {

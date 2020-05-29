@@ -11,3 +11,7 @@ EColor OppositeSide(EColor self) {
         throw std::logic_error("NONE is not color");
     return self == EColor::WHITE ? EColor::BLACK : EColor::WHITE;
 }
+
+std::ostream & operator<<(std::ostream & os, EColor color) {
+    return os << (color == EColor::WHITE ? "WHITE" : "BLACK");
+}

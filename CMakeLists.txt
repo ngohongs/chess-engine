@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 project(ngohongs)
 
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -fno-omit-frame-pointer")
 
 add_executable(ngohongs src/main.cpp
                         src/CApplication.cpp src/CApplication.h
@@ -14,4 +15,4 @@ add_executable(ngohongs src/main.cpp
                         src/CPiece.cpp src/CPiece.h
                         src/EColor.h src/EPiece.h
         src/CPieces/CRook.cpp src/CPieces/CRook.h
-        src/CPieces/CKnight.cpp src/CPieces/CKnight.h src/CPieces/CBishop.cpp src/CPieces/CBishop.h src/CPieces/CQueen.cpp src/CPieces/CQueen.h src/CPieces/CKing.cpp src/CPieces/CKing.h src/CPieces/CPawn.cpp src/CPieces/CPawn.h src/CCommands/CCommandBoard.cpp src/CCommands/CCommandBoard.h src/ETile.h src/CPieces/CEmpty.cpp src/CPieces/CEmpty.h src/EConst.h src/ETile.cpp src/FENTest.h src/CMove.cpp src/CMove.h src/CPieces/COffboard.cpp src/CPieces/COffboard.h src/EPiece.cpp src/EColor.cpp src/CHashKey.cpp src/CHashKey.h src/CHistory.cpp src/CHistory.h)
+        src/CPieces/CKnight.cpp src/CPieces/CKnight.h src/CPieces/CBishop.cpp src/CPieces/CBishop.h src/CPieces/CQueen.cpp src/CPieces/CQueen.h src/CPieces/CKing.cpp src/CPieces/CKing.h src/CPieces/CPawn.cpp src/CPieces/CPawn.h src/CCommands/CCommandBoard.cpp src/CCommands/CCommandBoard.h src/ETile.h src/CPieces/CEmpty.cpp src/CPieces/CEmpty.h src/EConst.h src/ETile.cpp src/FENTest.h src/CMove.cpp src/CMove.h src/CPieces/COffboard.cpp src/CPieces/COffboard.h src/EPiece.cpp src/EColor.cpp src/CHashKey.cpp src/CHashKey.h src/CHistory.cpp src/CHistory.h src/CPlayers/CPlayerHuman.cpp src/CPlayers/CPlayerHuman.h src/CCommands/CCommandMove.cpp src/CCommands/CCommandMove.h src/CPlayer.cpp src/CPlayer.h)

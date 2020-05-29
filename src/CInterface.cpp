@@ -67,5 +67,25 @@ std::ostream & CInterface::GetOstream() const {
     return m_Out;
 }
 
+std::istream & CInterface::GetIstream() const {
+    return m_In;
+}
+
+CMove CInterface::PromptMove() {
+    CMove move;
+    while (true) {
+        m_In >> move;
+        if (m_In.eof())
+            return {};
+        else if (!move.IsValid()) {
+            std::cout << move.GetFrom() << " " << move.GetTo() << std::endl;
+            m_Out << "non valid move, enter again:" << std::endl;
+            Clear();
+        }
+        else
+            return move;
+    }
+}
+
 
 

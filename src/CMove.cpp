@@ -35,6 +35,73 @@ std::ostream & operator<<(std::ostream & os, const CMove & self) {
     return os;
 }
 
+std::istream & operator>>(std::istream & is, CMove & self) {
+    std::string input;
+    is >> input;
+    input.push_back('\n');
+
+    char fromFile;
+    char fromRank;
+    char toFile;
+    char toRank;
+    char promotion;
+
+    if (sscanf(input.c_str(), "%c%c%c%c%c ", &fromFile, &fromRank, &toFile, &toRank, &promotion) != 5) {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    std::string from = "";
+    from.push_back(fromFile);
+    from.push_back(fromRank);
+
+    std::string to = "";
+    to.push_back(toFile);
+    to.push_back(toRank);
+
+    if (TileToIndex(from) == OFFBOARD || TileToIndex(to) == OFFBOARD ) {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    self.m_From = TileToIndex(from);
+    self.m_To = TileToIndex(to);
+
+    if (promotion == '\n')
+        return is;
+
+
+    if (promotion != 'q' && promotion != 'r' && promotion != 'b' && promotion != 'n') {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    if (promotion == 'q')
+        self.m_Promotion = EPiece::QUEEN;
+    else if (promotion == 'r')
+        self.m_Promotion = EPiece::ROOK;
+    else if (promotion == 'b')
+        self.m_Promotion = EPiece::BISHOP;
+    else
+        self.m_Promotion = EPiece::KNIGHT;
+
+    return is;
+}
+
+bool CMove::operator==(const CMove & other) const {
+    if (m_From != other.m_From)
+        return false;
+    if (m_To != other.m_To)
+        return false;
+    if (m_Promotion != other.m_Promotion)
+        return false;
+    return true;
+}
+
+bool CMove::IsValid() const {
+    return m_From != OFFBOARD && m_To != OFFBOARD;
+}
+
 CMove PushMove(EColor color, int from, int to) {
     return CMove(color, from, to, EPiece::EMPTY, false, false, EPiece::EMPTY, false, 0);
 }
