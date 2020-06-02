@@ -16,8 +16,8 @@ std::ostream & operator<<(std::ostream & os, const CGame & self) {
 
 CGame::CGame(CInterface & interface)
 : m_Interface(interface),
-  m_White(std::make_shared<CPlayerHuman>(interface, m_Board, EColor::WHITE)),
-  m_Black(std::make_shared<CPlayerHuman>(interface, m_Board, EColor::BLACK)) {
+  m_White(std::make_shared<CPlayerHuman>(interface, m_Board, EColor::BLACK)),
+  m_Black(std::make_shared<CPlayerAI>(interface, m_Board, EColor::WHITE)) {
 }
 
 bool CGame::MakeTurn() {

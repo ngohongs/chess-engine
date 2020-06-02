@@ -36,6 +36,7 @@ public:
 
     bool operator==(const CMove & other) const;
 
+    bool ExactMatch(const CMove & other) const;
     bool IsEnPassant() const {
         return m_EnPassant;
     }

@@ -10,14 +10,16 @@
 #include "CBoard.h"
 #include "CPlayer.h"
 #include "CPlayers/CPlayerHuman.h"
+#include "CPlayers/CPlayerAI.h"
 
 
 class CGame {
 private:
+    CBoard m_Board;
+
     std::shared_ptr<CPlayer> m_White;
     std::shared_ptr<CPlayer> m_Black;
     bool m_Initialized = false;
-    CBoard m_Board;
     EColor m_Side = EColor::WHITE;
     CInterface & m_Interface;
 public:

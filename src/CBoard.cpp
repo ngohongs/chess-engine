@@ -7,20 +7,20 @@
 
 #include "CBoard.h"
 
-uint64_t CaptureCount = 0;
-uint64_t EnPassantCount = 0;
-uint64_t PushCount = 0;
-uint64_t CheckCount = 0;
 
 CBoard::CBoard() {
+
     for (int i = 0; i < 120; i++)
         m_Board[i] = std::make_shared<COffboard>(COffboard(*this, i));
 
-    ReadFEN(PERFT6);
-    assert(PERFT6 == CreateFEN());
+    ReadFEN(MATEIN3);
+//    assert(START_FEN == CreateFEN());
     m_StateKey = m_HashKeys.GenerateStateKey(m_Board, m_Side, m_Castling, m_EnPassant);
-    UpdateScore();
-//    PerftTest(3);
+    m_HistoryKeys.emplace(m_StateKey, 1);
+    InitialScore();
+
+
+
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
@@ -230,7 +230,7 @@ bool CBoard::ReadFEN(const std::string & fen) {
         m_Turns = turn;
     else
         return false;
-
+    InitialScore();
     return true;
 }
 
@@ -398,14 +398,6 @@ bool CBoard::IsOffboard(int index) const {
     return m_Board[index]->GetPiece() == EPiece::OFFBOARD;
 }
 
-int CBoard::GetEnPassant() const {
-    return m_EnPassant;
-}
-
-unsigned int CBoard::GetCastling() const {
-    return m_Castling;
-}
-
 bool CBoard::RemovePiece(int index) {
     EColor targetColor = m_Board[index]->GetColor();
     int targetCode = m_Board[index]->GetCode();
@@ -467,19 +459,6 @@ bool CBoard::AddPiece(int index, EPiece piece, EColor color) {
         m_BlackScore += PIECE_SCORE[target->GetCode()];
     }
     return true;
-}
-
-void CBoard::UpdateScore() {
-    m_WhiteScore = 0;
-    m_BlackScore = 0;
-    for (int i = 7; i >= 0; i--) {
-        for (int j = A1; j <= H1; j++) {
-            if (m_Board[j + i * 10]->GetColor() == EColor::WHITE)
-                m_WhiteScore += PIECE_SCORE[m_Board[j + i * 10]->GetCode()];
-            if (m_Board[j + i * 10]->GetColor() == EColor::BLACK)
-                m_BlackScore += PIECE_SCORE[m_Board[j + i * 10]->GetCode()];
-        }
-    }
 }
 
 bool CBoard::MovePiece(int from, int to) {
@@ -546,24 +525,24 @@ bool CBoard::MakeMove(const CMove & move) {
         m_StateKey = m_HashKeys.HashEnPassant(m_EnPassant);
     m_StateKey = m_HashKeys.HashCastling(m_Castling);
 
-    m_History[m_Plies].m_Move = move;
-    m_History[m_Plies].m_FiftyTurns = m_FiftyTurns;
-    m_History[m_Plies].m_EnPassant = m_EnPassant;
-    m_History[m_Plies].m_Castling = m_Castling;
+    m_History[m_HistoryIndex].m_Move = move;
+    m_History[m_HistoryIndex].m_FiftyTurns = m_FiftyTurns;
+    m_History[m_HistoryIndex].m_EnPassant = m_EnPassant;
+    m_History[m_HistoryIndex].m_Castling = m_Castling;
 
 
     if (from == A1 || to == A1)
-        m_Castling &= 0xB;
+        m_Castling &= 0xBU;
     if (from == H1 || to == H1)
-        m_Castling &= 0x7;
+        m_Castling &= 0x7U;
     if (from == A8 || to == A8)
-        m_Castling &= 0xE;
+        m_Castling &= 0xEU;
     if (from == H8 || to == H8)
-        m_Castling &= 0xD;
+        m_Castling &= 0xDU;
     if (from == E1 || to == E1)
-        m_Castling &= 0x3;
+        m_Castling &= 0x3U;
     if (from == E8 || to == E8)
-        m_Castling &= 0xC;
+        m_Castling &= 0xCU;
     m_EnPassant = EMPTY;
 
     m_StateKey = m_HashKeys.HashCastling(m_Castling);
@@ -573,6 +552,7 @@ bool CBoard::MakeMove(const CMove & move) {
         m_FiftyTurns++;
     }
     m_Plies++;
+    m_HistoryIndex++;
 
     if (move.GetCapture() != EPiece::EMPTY && !move.IsEnPassant()) {
         RemovePiece(to);
@@ -612,6 +592,17 @@ bool CBoard::MakeMove(const CMove & move) {
     m_Side = OppositeSide(m_Side);
     m_StateKey = m_HashKeys.HashSide(m_Side);
 
+    if (m_HistoryKeys.find(m_StateKey) != m_HistoryKeys.end()) {
+        if (++m_HistoryKeys[m_StateKey] == 3) {
+            m_Repetitions = true;
+            std::cout << "\n\nREPETITION\n\n";
+        }
+    }
+    else {
+        m_HistoryKeys.emplace(m_StateKey, 1);
+    }
+
+
     if (TileAttacked(m_Side,king)) {
         UndoMove();
         return false;
@@ -620,11 +611,21 @@ bool CBoard::MakeMove(const CMove & move) {
 }
 
 bool CBoard::UndoMove() {
-    if (m_Side == EColor::WHITE)
-        m_Turns--;
-    m_Plies--;
 
-    CHistory undo = m_History[m_Plies];
+    if (m_HistoryKeys[m_StateKey] == 3) {
+        m_Repetitions = false;
+    }
+
+    m_HistoryKeys[m_StateKey]--;
+
+    if (m_Side == EColor::WHITE) {
+        m_Turns--;
+        m_FiftyTurns--;
+    }
+    m_Plies--;
+    m_HistoryIndex--;
+
+    CHistory undo = m_History[m_HistoryIndex];
     CMove undoMove = undo.m_Move;
     int from = undoMove.GetFrom();
     int to = undoMove.GetTo();
@@ -689,6 +690,7 @@ bool CBoard::UndoMove() {
         RemovePiece(from);
         AddPiece(from, EPiece::PAWN, m_Side);
     }
+
     return true;
 }
 
@@ -713,28 +715,6 @@ void CBoard::Perft(int depth, uint64_t & leafNodes) {
     }
 
     for (const auto & i : moveList) {
-//        std::cout << "//////////////////////////////////////////" << std::endl;
-//        std::cout << "BEFORE: " << i << std::endl;
-//        PrintState();
-//        std::cout << std::endl;
-
-        if (!MakeMove(i)) {
-//            std::cout << "ILLEGAL MOVE" << std::endl;
-//            std::cout << "//////////////////////////////////////////" << std::endl;
-            continue;
-        }
-        if (i.IsEnPassant())
-            EnPassantCount++;
-        else if (i.GetCapture() == EPiece::OFFBOARD)
-            assert(false);
-        else if (i.GetCapture() != EPiece::EMPTY)
-            CaptureCount++;
-        else
-            PushCount++;
-
-//        std::cout << "depth: " << depth << ",move: " << i << " --------------------------" << std::endl;
-//        PrintState();
-//        std::cout << "//////////////////////////////////////////" << std::endl << std::endl << std::endl;
         Perft(depth - 1, leafNodes);
         UndoMove();
     }
@@ -750,12 +730,6 @@ void CBoard::PerftRootTest(int depth, uint64_t & leafNodes) {
             continue;
         }
 
-        if (i.IsEnPassant())
-            EnPassantCount++;
-        else if (i.GetCapture() != EPiece::EMPTY)
-            CaptureCount++;
-        else
-            PushCount++;
 
         uint64_t currentLeafNodes = leafNodes;
         Perft(depth - 1, leafNodes);
@@ -780,3 +754,27 @@ void CBoard::PrintPieceNumTable() const {
     std::cout << std::endl;
 }
 
+bool CBoard::IsPossibleMove(const CMove & move) {
+    std::list<CMove> moveList = GenerateMovesForSide();
+    for (const auto & i : moveList) {
+        if (!MakeMove(i))
+            continue;
+        UndoMove();
+        if (move.ExactMatch(i))
+            return true;
+    }
+    return false;
+}
+
+void CBoard::InitialScore() {
+    m_WhiteScore = 0;
+    m_BlackScore = 0;
+    for (int i = 7; i >= 0; i--) {
+        for (int j = A1; j <= H1; j++) {
+            if (m_Board[j + i * 10]->GetColor() == EColor::WHITE)
+                m_WhiteScore += PIECE_SCORE[m_Board[j + i * 10]->GetCode()];
+            if (m_Board[j + i * 10]->GetColor() == EColor::BLACK)
+                m_BlackScore += PIECE_SCORE[m_Board[j + i * 10]->GetCode()];
+        }
+    }
+}

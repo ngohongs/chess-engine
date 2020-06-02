@@ -12,21 +12,21 @@ CMove::CMove(EColor color, int from, int to, EPiece capture, bool pawnStart, boo
 }
 
 std::ostream & CMove::Print(std::ostream & os) const {
-    os << (m_Side == EColor::WHITE ? 'w' : 'b');
+//    os << (m_Side == EColor::WHITE ? 'w' : 'b');
     os << IndexToTile(m_From) << IndexToTile(m_To);
     if (m_Promotion != EPiece::EMPTY)
         os << m_Promotion;
-    else
-        os << '-';
-
-    if (m_Capture != EPiece::EMPTY)
-        os << m_Capture;
-    else
-        os << '-';
-
-    os << (m_Castle ? 'C' : '-' );
-    os << (m_PawnTwoPush ? '2' : '-');
-    os << (m_EnPassant ? 'E' : '-');
+//    else
+//        os << '-';
+//
+//    if (m_Capture != EPiece::EMPTY)
+//        os << m_Capture;
+//    else
+//        os << '-';
+//
+//    os << (m_Castle ? 'C' : '-' );
+//    os << (m_PawnTwoPush ? '2' : '-');
+//    os << (m_EnPassant ? 'E' : '-');
     return os;
 }
 
@@ -100,6 +100,26 @@ bool CMove::operator==(const CMove & other) const {
 
 bool CMove::IsValid() const {
     return m_From != OFFBOARD && m_To != OFFBOARD;
+}
+
+bool CMove::ExactMatch(const CMove & other) const {
+    if (m_Side != other.m_Side)
+        return false;
+    if (m_From != other.m_From)
+        return false;
+    if (m_To != other.m_To)
+        return false;
+    if (m_Promotion != other.m_Promotion)
+        return false;
+    if (m_Capture != other.m_Capture)
+        return false;
+    if (m_PawnTwoPush != other.m_PawnTwoPush)
+        return false;
+    if (m_EnPassant != other.m_EnPassant)
+        return false;
+    if (m_Castle != other.m_Castle)
+        return false;
+    return true;
 }
 
 CMove PushMove(EColor color, int from, int to) {

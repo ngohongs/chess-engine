@@ -9,6 +9,7 @@
 
 CPlayerHuman::CPlayerHuman(CInterface & interface, CBoard & board, EColor side)
 : CPlayer(interface, board, side) {
+
 }
 
 bool CPlayerHuman::TakeTurn() {

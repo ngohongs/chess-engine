@@ -11,7 +11,9 @@
 #include <string>
 #include <cstring>
 #include <list>
+#include <map>
 #include <vector>
+#include <chrono>
 #include <memory>
 #include <sstream>
 #include <random>
@@ -54,13 +56,17 @@ private:
     CHashKey m_HashKeys;
     uint64_t m_StateKey;
 
-    int m_WhiteScore;
-    int m_BlackScore;
+    int m_WhiteScore = 0;
+    int m_BlackScore = 0;
 
     // TODO Better indexing for history, when loading with FEN with different ply than 0
+    int m_HistoryIndex = 0;
     std::vector<CHistory> m_History;
 
+    bool m_Repetitions = false;
     int m_PiecesCount[13] = {};
+
+    std::map<uint64_t, int> m_HistoryKeys;
 public:
     CBoard();
 
@@ -80,7 +86,6 @@ public:
 
     std::shared_ptr<CPiece> & operator[](int index);
 
-//    std::list<CMove> GenerateAllMoves(EColor side);
 
     bool RemovePiece(int index);
 
@@ -97,13 +102,57 @@ public:
     void PerftTest(int depth);
     void PerftRootTest(int depth, uint64_t & leafNodes);
 
+    bool IsPossibleMove(const CMove & move);
     bool UndoMove();
-    int GetEnPassant() const;
-    unsigned int GetCastling() const;
     bool IsEmpty(int index) const;
     bool IsOffboard(int index) const;
-    void UpdateScore();
     void PrintPieceNumTable() const;
+    void InitialScore();
+
+    int GetPlies() const {
+        return m_Plies;
+    }
+
+    int GetWhiteKing() const {
+        return m_WhiteKing;
+    }
+
+    int GetBlackKing() const {
+        return m_BlackKing;
+    }
+
+    bool IsDraw() const {
+        return m_Repetitions || m_FiftyTurns == 50;
+    }
+
+    const std::list<std::shared_ptr<CPiece>> & GetWhitePieces() const {
+        return m_WhitePieces;
+    }
+
+    const std::list<std::shared_ptr<CPiece>> & GetBlackPieces() const {
+        return m_BlackPieces;
+    }
+
+    int GetWhiteScore() const {
+        return m_WhiteScore;
+    };
+
+    int GetBlackScore() const {
+        return m_BlackScore;
+    }
+
+    unsigned int GetCastling() const {
+        return m_Castling;
+    }
+
+    int GetEnPassant() const {
+        return m_EnPassant;
+    }
+
+    uint64_t GetStateKey() const {
+        return m_StateKey;
+    }
+
     EColor GetSide() const {
         return m_Side;
     }
