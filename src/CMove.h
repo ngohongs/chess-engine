@@ -74,15 +74,23 @@ public:
     }
 
     bool IsValid() const;
+
+    bool IsCapture() const {
+        return m_Capture != EPiece::EMPTY;
+    }
+
+    bool operator<(const CMove & other) const {
+        return m_Score > other.m_Score;
+    }
 };
 
 CMove PushMove(EColor color, int from, int to);
 
-CMove CaptureMove(EColor color, int from, int to, EPiece capture, bool enPassant = false);
+CMove CaptureMove(EPiece piece, EColor color, int from, int to, EPiece capture, bool enPassant = false);
 
 CMove PawnTwoForward(EColor color, int from, int to);
 
-CMove PromotionMove(EColor color, int from, int to, EPiece capture, EPiece promotion);
+CMove PromotionMove(EPiece piece, EColor color, int from, int to, EPiece capture, EPiece promotion);
 
 CMove CastleMove(EColor color, int castling);
 

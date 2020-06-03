@@ -126,16 +126,18 @@ CMove PushMove(EColor color, int from, int to) {
     return CMove(color, from, to, EPiece::EMPTY, false, false, EPiece::EMPTY, false, 0);
 }
 
-CMove PromotionMove(EColor color, int from, int to, EPiece capture, EPiece promotion) {
-    return CMove(color, from, to, capture, false, false, promotion, false, 0);
+CMove PromotionMove(EPiece piece, EColor color, int from, int to, EPiece capture, EPiece promotion) {
+    if (capture == EPiece::EMPTY)
+        return CMove(color, from, to, capture, false, false, promotion, false, 0);
+    return CMove(color, from, to, capture, false, false, promotion, false, CAPTURE_SCORE[EPieceToCode(capture)] + 6 - ( CAPTURE_SCORE[EPieceToCode(piece)] / 100) + 1000000);
 }
 
 CMove PawnTwoForward(EColor color, int from, int to) {
     return CMove(color, from, to, EPiece::EMPTY, true, false, EPiece::EMPTY, false, 0);
 }
 
-CMove CaptureMove(EColor color, int from, int to, EPiece capture, bool enPassant) {
-    return CMove(color, from, to, capture, false, enPassant, EPiece::EMPTY, false, 100);
+CMove CaptureMove(EPiece piece, EColor color, int from, int to, EPiece capture, bool enPassant) {
+    return CMove(color, from, to, capture, false, enPassant, EPiece::EMPTY, false, CAPTURE_SCORE[EPieceToCode(capture)] + 6 - ( CAPTURE_SCORE[EPieceToCode(piece)] / 100) + 1000000);
 }
 
 CMove CastleMove(EColor color, int castling) {

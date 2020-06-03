@@ -33,7 +33,7 @@ std::list<CMove> CBishop::MoveList() const {
 
             if (piece != EPiece::EMPTY) {
                 if (color == oppositeSide)
-                    moveList.push_back(CaptureMove(m_Color, m_Coord, tempTile, m_Board[tempTile]->GetPiece(),
+                    moveList.push_back(CaptureMove(m_Piece, m_Color, m_Coord, tempTile, m_Board[tempTile]->GetPiece(),
                                                    false));
                 break;
             }

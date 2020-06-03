@@ -59,7 +59,6 @@ private:
     int m_WhiteScore = 0;
     int m_BlackScore = 0;
 
-    // TODO Better indexing for history, when loading with FEN with different ply than 0
     int m_HistoryIndex = 0;
     std::vector<CHistory> m_History;
 
@@ -67,6 +66,8 @@ private:
     int m_PiecesCount[13] = {};
 
     std::map<uint64_t, int> m_HistoryKeys;
+    std::map<int, int> m_SearchKillers;
+    std::map<int, int> m_SearchHistory;
 public:
     CBoard();
 

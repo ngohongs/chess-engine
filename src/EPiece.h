@@ -18,4 +18,6 @@ enum class EPiece : char {
     OFFBOARD = ' '
 };
 
+int EPieceToCode(EPiece piece);
+
 std::ostream & operator<< (std::ostream & os, const EPiece & self);

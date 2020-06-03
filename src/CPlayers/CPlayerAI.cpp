@@ -5,14 +5,14 @@
 
 #include "CPlayerAI.h"
 
+#include <iostream>
 
 const int MATE = 29000;
 
 CPlayerAI::CPlayerAI(CInterface & interface, CBoard & board, EColor side)
 : CPlayer(interface, board, side) {
     m_Board.PrintState();
-    std::cout << std::endl;
-    Search(4);
+    Search(5);
 //    char command;
 //    while (true) {
 //        std::cin >> command;
@@ -23,7 +23,7 @@ CPlayerAI::CPlayerAI(CInterface & interface, CBoard & board, EColor side)
 //            m_Board.PrintState();
 //            std::cout << std::endl;
 //            moveList = m_Board.GenerateMovesForSide();
-//            m_PrincipleVariation.emplace(m_Board.GetStateKey(), moveList.back());
+//            m_PrincipleVariation.e1mplace(m_Board.GetStateKey(), moveList.back());
 //            m_Board.MakeMove(moveList.back());
 //            m_Board.PrintState();
 //            std::cout << std::endl;
@@ -102,9 +102,9 @@ int CPlayerAI::UpdateScore() {
         else if (i->GetPiece() == EPiece::KNIGHT)
             score += KNIGHT_SCORE[i->GetCoord()];
         else if (i->GetPiece() == EPiece::BISHOP)
-            score += BISHOP_SCORE[i->GetCode()];
+            score += BISHOP_SCORE[i->GetCoord()];
         else if (i->GetPiece() == EPiece::ROOK)
-            score += ROOK_SCORE[i->GetCode()];
+            score += ROOK_SCORE[i->GetCoord()];
     }
 
     for (const auto & i : m_Board.GetBlackPieces()) {
@@ -113,9 +113,9 @@ int CPlayerAI::UpdateScore() {
         else if (i->GetPiece() == EPiece::KNIGHT)
             score -= KNIGHT_SCORE[MIRROR[i->GetCoord()]];
         else if (i->GetPiece() == EPiece::BISHOP)
-            score -= BISHOP_SCORE[MIRROR[i->GetCode()]];
+            score -= BISHOP_SCORE[MIRROR[i->GetCoord()]];
         else if (i->GetPiece() == EPiece::ROOK)
-            score -= ROOK_SCORE[MIRROR[i->GetCode()]];
+            score -= ROOK_SCORE[MIRROR[i->GetCoord()]];
     }
 
     if (m_Board.GetSide() == EColor::BLACK)
@@ -158,6 +158,7 @@ int CPlayerAI::AlphaBeta(int alpha, int beta, int depth, bool nullMove) {
     }
 
     std::list<CMove> moveList = m_Board.GenerateMovesForSide();
+    moveList.sort();
 
     int legal = 0;
     int oldAlpha = alpha;
@@ -178,6 +179,9 @@ int CPlayerAI::AlphaBeta(int alpha, int beta, int depth, bool nullMove) {
                if (legal == 1)
                    m_FailFirst++;
                m_FailHigh++;
+//               if (!i.IsCapture()) {
+//                   m_SearchKillers
+//               }
                return beta;
            }
            alpha = score;

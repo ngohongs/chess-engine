@@ -34,4 +34,7 @@ const char * const PERFT5 = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ
 const char * const PERFT6 = "r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10";
 
 const char * const MATEIN3 = "2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - - 0 1";
+const char * const AITEST1 = "r1b1k2r/ppppnppp/2n2q2/2b5/3NP3/2P1B3/PP3PPP/RN1QKB1R w KQkq - 0 1";
+const char * const EVALUATE1 = "r1b1k2r/ppp1nppp/2p2q2/8/4P3/2P1P3/PP4PP/RN1QKB1R w KQkq - 0 1";
+const char * const EVALUATE2 = "r1b1k2r/ppp1nppp/2p2q2/2B5/4P3/2P5/PP3PPP/RN1QKB1R b KQkq - 0 1";
 

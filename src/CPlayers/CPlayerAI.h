@@ -9,6 +9,7 @@
 #include <list>
 #include "../CPlayer.h"
 #include "../CMove.h"
+#include "../EConst.h"
 
 
 class CPlayerAI : public CPlayer {

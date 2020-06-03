@@ -13,14 +13,11 @@ CBoard::CBoard() {
     for (int i = 0; i < 120; i++)
         m_Board[i] = std::make_shared<COffboard>(COffboard(*this, i));
 
-    ReadFEN(MATEIN3);
+    ReadFEN(AITEST1);
 //    assert(START_FEN == CreateFEN());
     m_StateKey = m_HashKeys.GenerateStateKey(m_Board, m_Side, m_Castling, m_EnPassant);
     m_HistoryKeys.emplace(m_StateKey, 1);
     InitialScore();
-
-
-
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {

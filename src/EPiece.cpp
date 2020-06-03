@@ -24,3 +24,22 @@ std::ostream & operator<<(std::ostream & os, const EPiece & self) {
     else
         return os << '-';
 }
+
+int EPieceToCode(EPiece piece) {
+    switch (piece) {
+        case EPiece::PAWN:
+            return 0;
+        case EPiece::KNIGHT:
+            return 1;
+        case EPiece::BISHOP:
+            return 2;
+        case EPiece::ROOK:
+            return 3;
+        case EPiece::QUEEN:
+            return 4;
+        case EPiece::KING:
+            return 5;
+        default:
+            throw std::logic_error("No code for empty or offboard");
+    }
+}
