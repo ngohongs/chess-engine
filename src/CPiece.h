@@ -34,6 +34,8 @@ public:
 
     virtual std::ostream & Print(std::ostream & os) const = 0;
 
+    virtual std::list<CMove> CaptureMoveList() const = 0;
+
     friend std::ostream & operator<<(std::ostream & os, const CPiece & self);
 
     int GetCoord() const {

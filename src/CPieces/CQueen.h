@@ -17,6 +17,7 @@ public:
     std::ostream & Print(std::ostream & os) const;
 
     std::list<CMove> MoveList() const;
+    std::list<CMove> CaptureMoveList() const;
 };
 
 

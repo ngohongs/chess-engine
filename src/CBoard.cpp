@@ -703,6 +703,18 @@ std::list<CMove> CBoard::GenerateMovesForSide() {
     return moveList;
 }
 
+std::list<CMove> CBoard::GenerateCaptureMovesForSide() {
+    std::list<CMove> moveList;
+    if (m_Side == EColor::WHITE)
+        for (const auto & i : m_WhitePieces)
+            moveList.splice(moveList.end(), std::move(i->CaptureMoveList()));
+    else
+        for (const auto & i : m_BlackPieces)
+            moveList.splice(moveList.end(), std::move(i->CaptureMoveList()));
+
+    return moveList;
+}
+
 void CBoard::Perft(int depth, uint64_t & leafNodes) {
     std::ostringstream os;
     std::list<CMove> moveList = std::move(GenerateMovesForSide());

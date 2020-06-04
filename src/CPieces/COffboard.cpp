@@ -16,3 +16,7 @@ std::ostream & COffboard::Print(std::ostream & os) const {
 std::list<CMove> COffboard::MoveList() const {
     return std::list<CMove>();
 }
+
+std::list<CMove> COffboard::CaptureMoveList() const {
+    return std::list<CMove>();
+}

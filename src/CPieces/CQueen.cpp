@@ -22,7 +22,7 @@ std::list<CMove> CQueen::MoveList() const {
     EColor oppositeSide = OppositeSide(m_Color);
     EPiece piece;
     EColor color;
-    //Rook attacks
+
     for (int i : KING_ATTACKS) {
         tempTile = m_Coord + i;
         while (!m_Board.IsOffboard(tempTile)) {
@@ -31,6 +31,30 @@ std::list<CMove> CQueen::MoveList() const {
             if (piece == EPiece::EMPTY)
                 moveList.push_back(PushMove(m_Color, m_Coord, tempTile));
 
+            if (piece != EPiece::EMPTY) {
+                if (color == oppositeSide)
+                    moveList.push_back(CaptureMove(m_Piece, m_Color, m_Coord, tempTile, m_Board[tempTile]->GetPiece(),
+                                                   false));
+                break;
+            }
+            tempTile += i;
+        }
+    }
+    return moveList;
+}
+
+std::list<CMove> CQueen::CaptureMoveList() const {
+    std::list<CMove> moveList;
+    int tempTile;
+    EColor oppositeSide = OppositeSide(m_Color);
+    EPiece piece;
+    EColor color;
+
+    for (int i : KING_ATTACKS) {
+        tempTile = m_Coord + i;
+        while (!m_Board.IsOffboard(tempTile)) {
+            piece = m_Board[tempTile]->GetPiece();
+            color = m_Board[tempTile]->GetColor();
             if (piece != EPiece::EMPTY) {
                 if (color == oppositeSide)
                     moveList.push_back(CaptureMove(m_Piece, m_Color, m_Coord, tempTile, m_Board[tempTile]->GetPiece(),

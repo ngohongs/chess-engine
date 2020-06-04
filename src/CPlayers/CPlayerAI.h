@@ -19,8 +19,9 @@ private:
     int m_BestScore;
     int m_VisitedNodes = 0;
     int m_Ply = 0;
-    int m_SearchHistory[13][120];
-    int m_SearchKillers[2][64];
+    std::vector<std::vector<int>> m_SearchHistory;
+    std::map<int, CMove> m_SearchKillersFirst;
+    std::map<int, CMove> m_SearchKillersSecond;
     std::map<uint64_t, CMove> m_PrincipleVariation;
     double m_FailFirst = 0;
     double m_FailHigh = 0;
@@ -34,6 +35,8 @@ public:
     void Search(int depth);
 
     int AlphaBeta(int alpha, int beta, int depth, bool nullMove);
+
+    int Quiescence(int alpha, int beta);
 
     void ResetSearch();
 

@@ -23,7 +23,7 @@ std::list<CMove> CKing::MoveList() const {
         if (m_Board.IsOffboard(m_Coord + i))
             continue;
         // Push move
-        if (m_Board.IsEmpty(m_Coord + i) && !KingNeighbour(m_Coord + i))
+        if (m_Board.IsEmpty(m_Coord + i))// && !KingNeighbour(m_Coord + i))
             moveList.push_back(PushMove(m_Color, m_Coord, m_Coord + i));
         // Capture move
         if (m_Board[m_Coord + i]->GetColor() == oppositeSide)
@@ -82,5 +82,20 @@ bool CKing::KingNeighbour(int index) const {
         if (m_Board[index + i]->GetPiece() == EPiece::KING && m_Board[index + i]->GetColor() == oppositeSide)
             return true;
     return false;
+}
+
+std::list<CMove> CKing::CaptureMoveList() const {
+    std::list<CMove> moveList;
+    EColor oppositeSide = m_Color == EColor::WHITE ? EColor::BLACK : EColor::WHITE;
+    for (const auto & i : KING_ATTACKS) {
+        if (m_Board.IsOffboard(m_Coord + i))
+            continue;
+
+        // Capture move
+        if (m_Board[m_Coord + i]->GetColor() == oppositeSide)
+            moveList.push_back(CaptureMove(m_Piece, m_Color, m_Coord, m_Coord + i, m_Board[m_Coord + i]->GetPiece(),
+                                           false));
+    }
+    return moveList;
 }
 

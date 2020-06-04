@@ -97,6 +97,7 @@ public:
     bool MakeMove(const CMove & move);
 
     std::list<CMove> GenerateMovesForSide();
+    std::list<CMove> GenerateCaptureMovesForSide();
 
     void Perft(int depth, uint64_t & leafNodes);
 
@@ -123,7 +124,7 @@ public:
     }
 
     bool IsDraw() const {
-        return m_Repetitions || m_FiftyTurns == 50;
+        return m_Repetitions || m_FiftyTurns >= 50;
     }
 
     const std::list<std::shared_ptr<CPiece>> & GetWhitePieces() const {

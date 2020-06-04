@@ -73,6 +73,9 @@ public:
         return m_Side;
     }
 
+    void SetScore(int score) {
+        m_Score = score;
+    }
     bool IsValid() const;
 
     bool IsCapture() const {

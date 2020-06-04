@@ -16,3 +16,7 @@ std::ostream & CEmpty::Print(std::ostream & os) const {
 std::list<CMove> CEmpty::MoveList() const {
     return std::list<CMove>();
 }
+
+std::list<CMove> CEmpty::CaptureMoveList() const {
+    return std::list<CMove>();
+}

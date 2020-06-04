@@ -32,3 +32,17 @@ std::list<CMove> CKnight::MoveList() const {
     }
     return moveList;
 }
+
+std::list<CMove> CKnight::CaptureMoveList() const {
+    std::list<CMove> moveList;
+    EColor oppositeSide = OppositeSide(m_Color);
+    for (const auto & i : KNIGHT_ATTACKS) {
+        if (m_Board.IsOffboard(m_Coord + i))
+            continue;
+        // Capture move
+        if (m_Board[m_Coord + i]->GetColor() == oppositeSide)
+            moveList.push_back(CaptureMove(m_Piece, m_Color, m_Coord, m_Coord + i, m_Board[m_Coord + i]->GetPiece(),
+                                           false));
+    }
+    return moveList;
+}

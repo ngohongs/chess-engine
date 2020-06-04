@@ -88,3 +88,60 @@ std::list<CMove> CPawn::MoveList() const {
         moveList.push_back(CaptureMove(m_Piece, m_Color, m_Coord, m_Coord + diagonalTwo, EPiece::PAWN, true));
     return moveList;
 }
+
+std::list<CMove> CPawn::CaptureMoveList() const {
+    std::list<CMove> moveList;
+
+    int forward = m_Color == EColor::WHITE ? 10 : -10;
+    int diagonalOne = m_Color == EColor::WHITE ? 9 : -9;
+    int diagonalTwo = m_Color == EColor::WHITE ? 11 : -11;
+    EColor oppositeSide = OppositeSide(m_Color);
+    int startRank = m_Color == EColor::WHITE ? RANK_2 : RANK_7;
+    int promotionRank = m_Color == EColor::WHITE ? RANK_7 : RANK_2;
+    //Capture moves
+    if (!m_Board.IsOffboard(m_Coord + diagonalOne) && m_Board[m_Coord + diagonalOne]->GetColor() == oppositeSide) {
+        if (GetRank(m_Coord) == promotionRank) {
+            moveList.push_back(PromotionMove(m_Piece, m_Color, m_Coord, m_Coord + diagonalOne,
+                                             m_Board[m_Coord + diagonalOne]->GetPiece(),
+                                             EPiece::QUEEN));
+            moveList.push_back(PromotionMove(m_Piece, m_Color, m_Coord, m_Coord + diagonalOne,
+                                             m_Board[m_Coord + diagonalOne]->GetPiece(),
+                                             EPiece::ROOK));
+            moveList.push_back(PromotionMove(m_Piece, m_Color, m_Coord, m_Coord + diagonalOne,
+                                             m_Board[m_Coord + diagonalOne]->GetPiece(),
+                                             EPiece::BISHOP));
+            moveList.push_back(PromotionMove(m_Piece, m_Color, m_Coord, m_Coord + diagonalOne,
+                                             m_Board[m_Coord + diagonalOne]->GetPiece(),
+                                             EPiece::KNIGHT));
+        }
+        else
+            moveList.push_back(CaptureMove(m_Piece, m_Color, m_Coord, m_Coord + diagonalOne,
+                                           m_Board[m_Coord + diagonalOne]->GetPiece(), false));
+    }
+    if (!m_Board.IsOffboard(m_Coord + diagonalTwo) && m_Board[m_Coord + diagonalTwo]->GetColor() == oppositeSide) {
+        if (GetRank(m_Coord) == promotionRank) {
+            moveList.push_back(PromotionMove(m_Piece, m_Color, m_Coord, m_Coord + diagonalTwo,
+                                             m_Board[m_Coord + diagonalTwo]->GetPiece(),
+                                             EPiece::QUEEN));
+            moveList.push_back(PromotionMove(m_Piece, m_Color, m_Coord, m_Coord + diagonalTwo,
+                                             m_Board[m_Coord + diagonalTwo]->GetPiece(),
+                                             EPiece::ROOK));
+            moveList.push_back(PromotionMove(m_Piece, m_Color, m_Coord, m_Coord + diagonalTwo,
+                                             m_Board[m_Coord + diagonalTwo]->GetPiece(),
+                                             EPiece::BISHOP));
+            moveList.push_back(PromotionMove(m_Piece, m_Color, m_Coord, m_Coord + diagonalTwo,
+                                             m_Board[m_Coord + diagonalTwo]->GetPiece(),
+                                             EPiece::KNIGHT));
+        }
+        else
+            moveList.push_back(CaptureMove(m_Piece, m_Color, m_Coord, m_Coord + diagonalTwo,
+                                           m_Board[m_Coord + diagonalTwo]->GetPiece(), false));
+    }
+
+    //En Passant capture
+    if (m_Coord + diagonalOne == m_Board.GetEnPassant())
+        moveList.push_back(CaptureMove(m_Piece, m_Color, m_Coord, m_Coord + diagonalOne, EPiece::PAWN, true));
+    if (m_Coord + diagonalTwo == m_Board.GetEnPassant())
+        moveList.push_back(CaptureMove(m_Piece, m_Color, m_Coord, m_Coord + diagonalTwo, EPiece::PAWN, true));
+    return moveList;
+}
