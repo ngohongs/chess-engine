@@ -45,6 +45,7 @@ private:
     int m_Turns = 1;
     int m_FiftyTurns = 0;
     int m_EnPassant = EMPTY;
+    bool m_Checkmate = false;
     EColor m_Side = EColor::WHITE;
 
     std::list<std::shared_ptr<CPiece>> m_WhitePieces;
@@ -66,8 +67,6 @@ private:
     int m_PiecesCount[13] = {};
 
     std::map<uint64_t, int> m_HistoryKeys;
-    std::map<int, int> m_SearchKillers;
-    std::map<int, int> m_SearchHistory;
 public:
     CBoard();
 
@@ -123,9 +122,7 @@ public:
         return m_BlackKing;
     }
 
-    bool IsDraw() const {
-        return m_Repetitions || m_FiftyTurns >= 50;
-    }
+    bool IsDraw();
 
     const std::list<std::shared_ptr<CPiece>> & GetWhitePieces() const {
         return m_WhitePieces;
@@ -158,6 +155,14 @@ public:
     EColor GetSide() const {
         return m_Side;
     }
+
+    bool IsInCheck() const {
+        return TileAttacked(OppositeSide(m_Side),m_Side == EColor::WHITE ? m_WhiteKing : m_BlackKing);
+    }
+
+    bool NoPossibleMoves();
+
+    friend std::ostream & operator<<(std::ostream & os, const CBoard & board);
 };
 
 

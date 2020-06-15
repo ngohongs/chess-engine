@@ -9,48 +9,11 @@
 
 const int MATE = 29000;
 
-CPlayerAI::CPlayerAI(CInterface & interface, CBoard & board, EColor side)
-: CPlayer(interface, board, side) {
+CPlayerAI::CPlayerAI(CInterface & interface, CBoard & board, EColor side, int difficulty)
+: CPlayer(interface, board, side, true), m_Difficulty(difficulty) {
     m_SearchHistory.resize(120);
     for (int i = 0; i < 120; i++)
         m_SearchHistory[i].resize(120);
-    m_Board.PrintState();
-    Search(6);
-//    char command;
-//    while (true) {
-//        std::cin >> command;
-//        if (command == 'm') {
-//            std::list<CMove> moveList = m_Board.GenerateMovesForSide();
-//            m_PrincipleVariation.emplace(m_Board.GetStateKey(), moveList.front());
-//            m_Board.MakeMove(moveList.front());
-//            m_Board.PrintState();
-//            std::cout << std::endl;
-//            moveList = m_Board.GenerateMovesForSide();
-//            m_PrincipleVariation.e1mplace(m_Board.GetStateKey(), moveList.back());
-//            m_Board.MakeMove(moveList.back());
-//            m_Board.PrintState();
-//            std::cout << std::endl;
-//            moveList = m_Board.GenerateMovesForSide();
-//            m_PrincipleVariation.emplace(m_Board.GetStateKey(), moveList.front());
-//            m_Board.MakeMove(moveList.front());
-//            m_Board.PrintState();
-//            std::cout << std::endl;
-//        }
-//        else if (command == 'u') {
-//            for (int i = 0; i < 3; i++) {
-//                m_Board.UndoMove();
-//                m_Board.PrintState();
-//                std::cout << std::endl;
-//            }
-//        }
-//        else if (command == 'p') {
-//            for (const auto & i : GetPrincipleVariation(3))
-//                std::cout << i << std::endl;
-//        }
-//        else
-//            break;
-//
-//    }
 }
 
 void CPlayerAI::ResetSearch() {
@@ -126,7 +89,7 @@ int CPlayerAI::UpdateScore() {
     return score;
 }
 
-void CPlayerAI::Search(int depth) {
+CMove CPlayerAI::Search(int depth) {
     CMove bestMove;
     int bestScore = -INFINITE;
     ResetSearch();
@@ -134,28 +97,29 @@ void CPlayerAI::Search(int depth) {
         bestScore = AlphaBeta(-INFINITE, INFINITE, i, true);
         std::list<CMove> pv = GetPrincipleVariation(depth);
         bestMove = pv.front();
-        std::cout << "Depth: " << i << " score: " << bestScore << " move: " << bestMove << " nodes: " << m_VisitedNodes << std::endl;
-        for (const auto & j : pv)
-            std::cout << j << " ";
-        std::cout << std::endl;
-        std::cout << "ordering: " << m_FailFirst / m_FailHigh << std::endl << std::endl;
+//        std::cout << "Depth: " << i << " score: " << bestScore << " move: " << bestMove << " nodes: " << m_VisitedNodes << std::endl;
+//        for (const auto & j : pv)
+//            std::cout << j << " ";
+//        std::cout << std::endl;
+//        std::cout << "ordering: " << m_FailFirst / m_FailHigh << std::endl << std::endl;
     }
     m_BestMove = bestMove;
     m_BestScore = bestScore;
+    return bestMove;
 }
 
 int CPlayerAI::AlphaBeta(int alpha, int beta, int depth, bool nullMove) {
     if (!depth) {
         m_VisitedNodes++;
 //        std::cout << "alpha beta score: " << UpdateScore() << std::endl;
-        return Quiescence(alpha, beta);
+        return Quiescence(alpha, beta, 1);
 
     }
 
     m_VisitedNodes++;
 
     if (m_Board.IsDraw() && m_Ply) {
-        return 0;
+        return 1;
     }
 
     std::list<CMove> moveList = m_Board.GenerateMovesForSide();
@@ -236,13 +200,34 @@ int CPlayerAI::AlphaBeta(int alpha, int beta, int depth, bool nullMove) {
 }
 
 bool CPlayerAI::TakeTurn() {
-    return false;
+    CMove move = Search(m_Difficulty);
+    if (!m_Board.MakeMove(move)) {
+        std::cout << "ERJAKJRKLAJERKLAJ\n";
+        return false;
+    }
+    m_Interface.GetOstream() << '\n' << m_Side << "'s move: " << move << '\n' << std::endl;
+    if (m_Board.IsInCheck()) {
+        if (m_Board.NoPossibleMoves()) {
+            m_Interface.PromptMessage("Checkmate\n");
+            return false;
+        }
+        m_Interface.PromptMessage("Check\n");
+        return true;
+    }
+    if (m_Board.IsDraw()) {
+        m_Interface.PromptMessage("Draw\n");
+        return false;
+    }
+    return true;;
 }
 
-int CPlayerAI::Quiescence(int alpha, int beta) {
+int CPlayerAI::Quiescence(int alpha, int beta, int qdepth) {
     m_VisitedNodes++;
     if (m_Board.IsDraw())
         return 0;
+
+    if (qdepth >= 64)
+        return UpdateScore();
 
     int score = UpdateScore();
 
@@ -269,7 +254,7 @@ int CPlayerAI::Quiescence(int alpha, int beta) {
 
         legal++;
         m_Ply++;
-        score = -Quiescence(-beta, -alpha);
+        score = -Quiescence(-beta, -alpha, qdepth + 1);
         m_Board.UndoMove();
         m_Ply--;
         if (score > alpha) {

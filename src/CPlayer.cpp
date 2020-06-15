@@ -6,6 +6,6 @@
 #include "CPlayer.h"
 
 
-CPlayer::CPlayer(CInterface & interface, CBoard & board, EColor side)
-: m_Interface(interface), m_Board(board), m_Side(side) {
+CPlayer::CPlayer(CInterface & interface, CBoard & board, EColor side, bool computer)
+: m_Interface(interface), m_Board(board), m_Side(side), m_Computer(computer){
 }

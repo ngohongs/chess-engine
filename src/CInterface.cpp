@@ -27,7 +27,7 @@ std::string CInterface::PromptCommand(const std::function<bool (const std::strin
         else if (m_In.fail())
             throw std::runtime_error("Error during inputting command");
         else if (!valid(command)) {
-            std::cout << "Non-existing command. Enter a valid command, for help enter the command 'help'" << std::endl;
+            std::cout << "Non-existing command, Enter a valid command, for help enter the command 'help'" << std::endl;
             Clear();
             }
         else
@@ -70,22 +70,5 @@ std::ostream & CInterface::GetOstream() const {
 std::istream & CInterface::GetIstream() const {
     return m_In;
 }
-
-CMove CInterface::PromptMove() {
-    CMove move;
-    while (true) {
-        m_In >> move;
-        if (m_In.eof())
-            return {};
-        else if (!move.IsValid()) {
-            std::cout << move.GetFrom() << " " << move.GetTo() << std::endl;
-            m_Out << "non valid move, enter again:" << std::endl;
-            Clear();
-        }
-        else
-            return move;
-    }
-}
-
 
 

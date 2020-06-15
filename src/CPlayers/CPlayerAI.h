@@ -25,18 +25,19 @@ private:
     std::map<uint64_t, CMove> m_PrincipleVariation;
     double m_FailFirst = 0;
     double m_FailHigh = 0;
+    int m_Difficulty;
 public:
-    CPlayerAI(CInterface & interface, CBoard & board, EColor side);
+    CPlayerAI(CInterface & interface, CBoard & board, EColor side, int difficulty);
 
     bool TakeTurn() override;
 
     std::list<CMove> GetPrincipleVariation(int depth);
 
-    void Search(int depth);
+    CMove Search(int depth);
 
     int AlphaBeta(int alpha, int beta, int depth, bool nullMove);
 
-    int Quiescence(int alpha, int beta);
+    int Quiescence(int alpha, int beta, int qdepth);
 
     void ResetSearch();
 

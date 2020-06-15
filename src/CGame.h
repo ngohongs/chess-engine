@@ -22,6 +22,8 @@ private:
     bool m_Initialized = false;
     EColor m_Side = EColor::WHITE;
     CInterface & m_Interface;
+    EColor m_Computer;
+    bool m_End = false;
 public:
     CGame(CInterface & m_Interface);
 
@@ -29,6 +31,10 @@ public:
 
     const CBoard & GetBoard() const {
         return m_Board;
+    }
+
+    bool IsOver() const {
+        return m_End;
     }
 
     CBoard & GetBoard() {

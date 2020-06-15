@@ -8,7 +8,8 @@
 CMove::CMove(EColor color, int from, int to, EPiece capture, bool pawnStart, bool enPassant, EPiece promotion,
              bool castle,
              int score)
-: m_Side(color), m_From(from), m_To(to), m_Capture(capture), m_PawnTwoPush(pawnStart), m_EnPassant(enPassant), m_Promotion(promotion), m_Castle(castle), m_Score(score) {
+: m_Side(color), m_From(from), m_To(to), m_Capture(capture), m_PawnTwoPush(pawnStart),
+  m_EnPassant(enPassant), m_Promotion(promotion), m_Castle(castle), m_Score(score) {
 }
 
 std::ostream & CMove::Print(std::ostream & os) const {
@@ -38,6 +39,9 @@ std::ostream & operator<<(std::ostream & os, const CMove & self) {
 std::istream & operator>>(std::istream & is, CMove & self) {
     std::string input;
     is >> input;
+
+    if (is.eof())
+        return is;
     input.push_back('\n');
 
     char fromFile;
@@ -51,15 +55,15 @@ std::istream & operator>>(std::istream & is, CMove & self) {
         return is;
     }
 
-    std::string from = "";
+    std::string from;
     from.push_back(fromFile);
     from.push_back(fromRank);
 
-    std::string to = "";
+    std::string to;
     to.push_back(toFile);
     to.push_back(toRank);
 
-    if (TileToIndex(from) == OFFBOARD || TileToIndex(to) == OFFBOARD ) {
+    if (TileToIndex(from) == OFFBOARD || TileToIndex(to) == OFFBOARD) {
         is.setstate(std::ios::failbit);
         return is;
     }

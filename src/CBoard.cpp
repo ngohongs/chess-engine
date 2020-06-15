@@ -13,7 +13,7 @@ CBoard::CBoard() {
     for (int i = 0; i < 120; i++)
         m_Board[i] = std::make_shared<COffboard>(COffboard(*this, i));
 
-    ReadFEN(AITEST1);
+    ReadFEN(CHECKMATE);
 //    assert(START_FEN == CreateFEN());
     m_StateKey = m_HashKeys.GenerateStateKey(m_Board, m_Side, m_Castling, m_EnPassant);
     m_HistoryKeys.emplace(m_StateKey, 1);
@@ -21,17 +21,32 @@ CBoard::CBoard() {
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
-    os << "    A B C D E F G H" << std::endl;
-    os << "  +-----------------+" << std::endl;
-    for (int i = 7; i >= 0; i--) {
-        os << i + 1 << " | ";
-        for (int j = A1; j <= H1; j++) {
-            os << *m_Board[j + i * 10] << ' ';
+    if (m_Side == EColor::WHITE) {
+        os << "    A B C D E F G H" << std::endl;
+        os << "  +-----------------+" << std::endl;
+        for (int i = 7; i >= 0; i--) {
+            os << i + 1 << " | ";
+            for (int j = A1; j <= H1; j++) {
+                os << *m_Board[j + i * 10] << ' ';
+            }
+            os << "| " << i + 1 << std::endl;
         }
-        os << "| " << i + 1 << std::endl;
+        os << "  +-----------------+" << std::endl;
+        os << "    A B C D E F G H" << std::endl;
     }
-    os << "  +-----------------+" << std::endl;
-    os << "    A B C D E F G H" << std::endl;
+    else {
+        os << "    A B C D E F G H" << std::endl;
+        os << "  +-----------------+" << std::endl;
+        for (int i = 0; i <= 7; i++) {
+            os << i + 1 << " | ";
+            for (int j = A1; j <= H1; j++) {
+                os << *m_Board[j + i * 10] << ' ';
+            }
+            os << "| " << i + 1 << std::endl;
+        }
+        os << "  +-----------------+" << std::endl;
+        os << "    A B C D E F G H" << std::endl;
+    }
     return os;
 }
 
@@ -251,7 +266,7 @@ void CBoard::PrintState() const {
 }
 
 std::string CBoard::CreateFEN() const {
-    std::string fen = "";
+    std::string fen;
     int code;
     int count = 0;
     for (int i = 7; i >= 0; i--) {
@@ -688,6 +703,9 @@ bool CBoard::UndoMove() {
         AddPiece(from, EPiece::PAWN, m_Side);
     }
 
+    if (IsInCheck() && GenerateMovesForSide().empty())
+        m_Checkmate = true;
+
     return true;
 }
 
@@ -702,6 +720,7 @@ std::list<CMove> CBoard::GenerateMovesForSide() {
 
     return moveList;
 }
+
 
 std::list<CMove> CBoard::GenerateCaptureMovesForSide() {
     std::list<CMove> moveList;
@@ -786,4 +805,59 @@ void CBoard::InitialScore() {
                 m_BlackScore += PIECE_SCORE[m_Board[j + i * 10]->GetCode()];
         }
     }
+}
+
+bool CBoard::IsDraw() {
+    int totalPieces = m_WhitePieces.size() + m_BlackPieces.size();
+    int whiteBishops = 0;
+    int blackBishops = 0;
+    int whiteKnights = 0;
+    int blackKnights = 0;
+
+    int king = m_Side == EColor::WHITE ? m_WhiteKing : m_BlackKing;
+
+    for (const auto & i : m_WhitePieces) {
+        if (i->GetPiece() == EPiece::BISHOP)
+            whiteBishops++;
+        if (i->GetPiece() == EPiece::KNIGHT)
+            whiteKnights++;
+    }
+
+    for (const auto & i : m_BlackPieces) {
+        if (i->GetPiece() == EPiece::BISHOP)
+            blackBishops++;
+        if (i->GetPiece() == EPiece::KNIGHT)
+            blackKnights++;
+    }
+
+    if (m_Repetitions || m_FiftyTurns >= 50)
+        return true;
+    // Impossible checkmate
+    else if (whiteBishops == 1 && blackBishops == 1 && totalPieces == 4)
+        return true;
+    else if ((whiteKnights == 1 || whiteBishops == 1 || blackKnights == 1 || blackBishops == 1) && totalPieces == 3)
+        return true;
+    else if (totalPieces == 2)
+        return true;
+    // Stalemate
+    else if (GenerateMovesForSide().empty() && !TileAttacked(OppositeSide(m_Side), king))
+        return true;
+    else
+        return false;
+}
+
+bool CBoard::NoPossibleMoves() {
+    std::list<CMove> moveList = GenerateMovesForSide();
+    for (const auto & i : moveList) {
+        if (MakeMove(i)) {
+            UndoMove();
+            return false;
+        }
+    }
+    return true;
+}
+
+std::ostream & operator<<(std::ostream & os, const CBoard & board) {
+    board.Print(os);
+    return os;
 }

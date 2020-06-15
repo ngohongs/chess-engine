@@ -28,12 +28,12 @@ int TileToIndex(const std::string & position) {
 }
 
 std::string IndexToTile(int index) {
-    std::string res = "";
+    std::string res;
     int file = index % 10;
     int rank = index / 10;
 
     if (1 > file || file > 8 || 2 > rank || rank > 9)
-        return "EMPTY";
+        return "OFFBOARD";
 
     res.push_back(file - 1 + 'a');
     res.push_back(rank - 2 + '1');
