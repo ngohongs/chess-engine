@@ -102,6 +102,7 @@ CMove CPlayerAI::Search(int depth) {
 //            std::cout << j << " ";
 //        std::cout << std::endl;
 //        std::cout << "ordering: " << m_FailFirst / m_FailHigh << std::endl << std::endl;
+
     }
     m_BestMove = bestMove;
     m_BestScore = bestScore;

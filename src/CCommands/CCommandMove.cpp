@@ -10,5 +10,11 @@ CCommandMove::CCommandMove(const CInterface & interface, const char * help, CGam
 }
 
 bool CCommandMove::Execute() {
+    std::string bin;
+    if (!m_Game.IsInitialized()) {
+        m_Interface.GetIstream() >> bin;
+        m_Interface.PromptMessage("Game is not initialzed yet, for help enter the command 'help'\n");
+        return true;
+    }
     return m_Game.MakeTurn();
 }

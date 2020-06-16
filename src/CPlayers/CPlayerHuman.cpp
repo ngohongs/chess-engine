@@ -35,7 +35,7 @@ bool CPlayerHuman::TakeTurn() {
                 break;
             }
 
-            m_Interface.GetOstream() << '\n' << m_Side << "'s move: " << i << '\n' << std::endl;
+            m_Interface.GetOstream() << '\n' << m_Side << "'s move p: " << i << '\n' << std::endl;
             if (m_Board.IsInCheck()) {
                 if (m_Board.NoPossibleMoves()) {
                     m_Interface.PromptMessage("Checkmate\n");

@@ -9,6 +9,7 @@
 CApplication::CApplication(const CInterface &interface)
 : m_Interface(interface), m_Game(m_Interface)
 {
+    m_Commands.emplace("play", std::make_unique<CCommandPlay>(m_Interface, "initialize game", m_Game));
     m_Commands.emplace("move", std::make_unique<CCommandMove>(CCommandMove(m_Interface, "make move", m_Game)));
     m_Commands.emplace("board", std::make_unique<CCommandBoard>(CCommandBoard(m_Interface, "shows the state of chess board", m_Game)));
     m_Commands.emplace("help", std::make_unique<CCommandHelp>(CCommandHelp(m_Interface, "shows commands used by this program", m_Commands)));

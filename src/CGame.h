@@ -17,8 +17,8 @@ class CGame {
 private:
     CBoard m_Board;
 
-    std::shared_ptr<CPlayer> m_White;
-    std::shared_ptr<CPlayer> m_Black;
+    std::unique_ptr<CPlayer> m_White = nullptr;
+    std::unique_ptr<CPlayer> m_Black = nullptr;
     bool m_Initialized = false;
     EColor m_Side = EColor::WHITE;
     CInterface & m_Interface;
@@ -26,6 +26,10 @@ private:
     bool m_End = false;
 public:
     CGame(CInterface & m_Interface);
+
+    bool InitializePlayerVsPlayer();
+
+    bool InitializePlayerVsComputer(EColor computerSide, int difficulty);
 
     bool MakeTurn();
 
@@ -42,6 +46,10 @@ public:
     }
 
     friend std::ostream & operator<< (std::ostream & os, const CGame & self);
+
+    bool IsInitialized() const {
+        return m_Initialized;
+    }
 };
 
 

@@ -15,13 +15,12 @@ std::ostream & operator<<(std::ostream & os, const CGame & self) {
 }
 
 CGame::CGame(CInterface & interface)
-: m_Interface(interface),
-  m_White(std::make_shared<CPlayerAI>(interface, m_Board, EColor::WHITE, 2)),
-  m_Black(std::make_shared<CPlayerHuman>(interface, m_Board, EColor::BLACK)) {
-    m_Interface.GetOstream() << m_Board;
-    if (m_Board.GetSide() == EColor::WHITE ? m_White->IsComputer() : m_Black->IsComputer())
-        m_End = !MakeTurn();
+: m_Interface(interface) {
+//    m_Interface.GetOstream() << m_Board;
+//    if (m_Board.GetSide() == EColor::WHITE ? m_White->IsComputer() : m_Black->IsComputer())
+//        m_End = !MakeTurn();
 }
+
 
 bool CGame::MakeTurn() {
     if (m_End)
@@ -39,3 +38,38 @@ bool CGame::MakeTurn() {
     }
     return true;
 }
+
+bool CGame::InitializePlayerVsPlayer() {
+    m_White = std::make_unique<CPlayerHuman>(m_Interface, m_Board, EColor::WHITE);
+    m_Black = std::make_unique<CPlayerHuman>(m_Interface, m_Board, EColor::BLACK);
+
+    m_Initialized = true;
+    return true;
+}
+
+bool CGame::InitializePlayerVsComputer(EColor computerSide, int difficulty) {
+    if (computerSide == EColor::WHITE) {
+        m_White = std::make_unique<CPlayerAI>(m_Interface, m_Board, EColor::WHITE, difficulty);
+        m_Black = std::make_unique<CPlayerHuman>(m_Interface, m_Board, EColor::BLACK);
+    }
+    else if (computerSide == EColor::BLACK) {
+        m_White = std::make_unique<CPlayerHuman>(m_Interface, m_Board, EColor::WHITE);
+        m_Black = std::make_unique<CPlayerAI>(m_Interface, m_Board, EColor::BLACK, difficulty);
+    }
+    else
+        throw std::runtime_error("Error during creating game.");
+
+
+    m_Interface.GetOstream() << m_Board;
+    if (m_Board.GetSide() == EColor::WHITE ? m_White->IsComputer() : m_Black->IsComputer()) {
+        if (!(m_Board.GetSide() == EColor::WHITE ? m_White->TakeTurn() : m_Black->TakeTurn())) {
+            m_End = true;
+            return false;
+        }
+    }
+
+    m_Initialized = true;
+    return true;
+}
+
+
