@@ -45,11 +45,13 @@ public:
         return m_Board;
     }
 
-    friend std::ostream & operator<< (std::ostream & os, const CGame & self);
+    std::ostream & Print (std::ostream & os);
 
     bool IsInitialized() const {
         return m_Initialized;
     }
+
+    friend std::ostream & operator<<(std::ostream & os, const CGame & self);
 };
 
 

@@ -8,7 +8,7 @@
 
 
 CPlayerHuman::CPlayerHuman(CInterface & interface, CBoard & board, EColor side)
-: CPlayer(interface, board, side, false) {
+: CPlayer(interface, board, side, false, 0) {
 
 }
 

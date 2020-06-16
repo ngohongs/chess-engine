@@ -17,6 +17,7 @@
 #include <memory>
 #include <sstream>
 #include <random>
+#include <fstream>
 #include "CPiece.h"
 #include "EColor.h"
 #include "CPieces/CKing.h"
@@ -163,6 +164,10 @@ public:
     bool NoPossibleMoves();
 
     friend std::ostream & operator<<(std::ostream & os, const CBoard & board);
+
+    bool Save(const std::string & path) const;
+
+    bool Load(const std::string & path) const;
 };
 
 

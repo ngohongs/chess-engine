@@ -21,32 +21,32 @@ CBoard::CBoard() {
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
-    if (m_Side == EColor::WHITE) {
-        os << "    A B C D E F G H" << std::endl;
-        os << "  +-----------------+" << std::endl;
-        for (int i = 7; i >= 0; i--) {
-            os << i + 1 << " | ";
-            for (int j = A1; j <= H1; j++) {
-                os << *m_Board[j + i * 10] << ' ';
-            }
-            os << "| " << i + 1 << std::endl;
+//    if (m_Side == EColor::WHITE) {
+    os << "    A B C D E F G H" << std::endl;
+    os << "  +-----------------+" << std::endl;
+    for (int i = 7; i >= 0; i--) {
+        os << i + 1 << " | ";
+        for (int j = A1; j <= H1; j++) {
+            os << *m_Board[j + i * 10] << ' ';
         }
-        os << "  +-----------------+" << std::endl;
-        os << "    A B C D E F G H" << std::endl;
+        os << "| " << i + 1 << std::endl;
     }
-    else {
-        os << "    A B C D E F G H" << std::endl;
-        os << "  +-----------------+" << std::endl;
-        for (int i = 0; i <= 7; i++) {
-            os << i + 1 << " | ";
-            for (int j = A1; j <= H1; j++) {
-                os << *m_Board[j + i * 10] << ' ';
-            }
-            os << "| " << i + 1 << std::endl;
-        }
-        os << "  +-----------------+" << std::endl;
-        os << "    A B C D E F G H" << std::endl;
-    }
+    os << "  +-----------------+" << std::endl;
+    os << "    A B C D E F G H" << std::endl;
+//    }
+//    else {
+//        os << "    A B C D E F G H" << std::endl;
+//        os << "  +-----------------+" << std::endl;
+//        for (int i = 0; i <= 7; i++) {
+//            os << i + 1 << " | ";
+//            for (int j = A1; j <= H1; j++) {
+//                os << *m_Board[j + i * 10] << ' ';
+//            }
+//            os << "| " << i + 1 << std::endl;
+//        }
+//        os << "  +-----------------+" << std::endl;
+//        os << "    A B C D E F G H" << std::endl;
+//    }
     return os;
 }
 
@@ -858,6 +858,18 @@ bool CBoard::NoPossibleMoves() {
 }
 
 std::ostream & operator<<(std::ostream & os, const CBoard & board) {
-    board.Print(os);
+    os << board.CreateFEN() << std::endl;
+    int cnt = 0;
+    uint64_t key = 0;
+    uint64_t sum = 0;
+    os << board.m_HashKeys;
+    os << board.m_StateKey << std::endl;
+    for (const auto & i : board.m_HistoryKeys) {
+        cnt++;
+        key ^= i.first ^ i.second;
+        sum += i.first + i.second;
+        os << i.first << " : " << i.second << std::endl;
+    }
+    os << cnt << ' ' << key << ' ' << sum << std::endl;
     return os;
 }

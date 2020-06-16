@@ -35,6 +35,10 @@ public:
     uint64_t HashEnPassant(int tile);
 
     uint64_t GetStateKey() const;
+
+    friend std::ostream & operator<<(std::ostream & os, const CHashKey & self);
+
+
 };
 
 

@@ -10,6 +10,12 @@ CCommandPlay::CCommandPlay(const CInterface & interface, const char * help, CGam
 }
 
 bool CCommandPlay::Execute() {
+    std::string bin;
+    if (m_Game.IsInitialized()) {
+        m_Interface.GetIstream() >> bin;
+        m_Interface.PromptMessage("Game is already initialzed.\n");
+        return true;
+    }
     std::string input;
     char white;
     char black;

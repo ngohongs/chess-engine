@@ -10,7 +10,7 @@
 const int MATE = 29000;
 
 CPlayerAI::CPlayerAI(CInterface & interface, CBoard & board, EColor side, int difficulty)
-: CPlayer(interface, board, side, true), m_Difficulty(difficulty) {
+: CPlayer(interface, board, side, true, difficulty) {
     m_SearchHistory.resize(120);
     for (int i = 0; i < 120; i++)
         m_SearchHistory[i].resize(120);

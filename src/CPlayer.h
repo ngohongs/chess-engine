@@ -18,13 +18,17 @@ protected:
     CBoard & m_Board;
     CInterface & m_Interface;
     bool m_Computer = false;
+    int m_Difficulty = 0;
 public:
-    CPlayer(CInterface & interface, CBoard & board, EColor side, bool computer);
+    CPlayer(CInterface & interface, CBoard & board, EColor side, bool computer, int difficulty);
 
     virtual ~CPlayer() = default;
 
     virtual bool TakeTurn() = 0;
 
+    int GetDifficulty() const {
+        return m_Difficulty;
+    }
     bool IsComputer() const {
         return m_Computer;
     }

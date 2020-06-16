@@ -25,7 +25,6 @@ private:
     std::map<uint64_t, CMove> m_PrincipleVariation;
     double m_FailFirst = 0;
     double m_FailHigh = 0;
-    int m_Difficulty;
 public:
     CPlayerAI(CInterface & interface, CBoard & board, EColor side, int difficulty);
 

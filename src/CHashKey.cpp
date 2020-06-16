@@ -64,4 +64,40 @@ uint64_t CHashKey::GetStateKey() const {
     return m_StateKey;
 }
 
+std::ostream & operator<<(std::ostream & os, const CHashKey & self) {
+    uint64_t key = 0;
+    uint64_t sum = 0;
+    uint64_t finalKey = 0;
+    for (int i = 0; i < 12; i++) {
+        for (int j = 0; j < 120; j++) {
+            os << self.m_PiecesKeys[i][j] << ' ';
+            key ^= self.m_PiecesKeys[i][j];
+            finalKey ^= self.m_PiecesKeys[i][j];
+            sum += self.m_PiecesKeys[i][j];
+        }
+    }
+    os << key << std::endl;
+    key = 0;
+    for (int i = 0; i < 16; i++) {
+        os << self.m_CastlingKeys[i] << ' ';
+        key ^= self.m_CastlingKeys[i];
+        finalKey ^= self.m_CastlingKeys[i];
+        sum += self.m_CastlingKeys[i];
+    }
+    os << key << std::endl;
+    key = 0;
+    for (int i = 0; i < 120; i++) {
+        os << self.m_EnPassantKey[i] << ' ';
+        key ^= self.m_EnPassantKey[i];
+        finalKey ^= self.m_EnPassantKey[i];
+        sum += self.m_EnPassantKey[i];
+    }
+    os << key << std::endl;
+
+    os << self.m_WhiteTurnKey << std::endl;
+    finalKey ^= self.m_WhiteTurnKey;
+    os << finalKey << ' ' << sum << std::endl;
+    return os;
+}
+
 

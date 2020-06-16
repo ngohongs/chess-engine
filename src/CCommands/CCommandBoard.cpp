@@ -14,6 +14,6 @@ bool CCommandBoard::Execute() {
         m_Interface.PromptMessage("Game is not initialzed yet, for help enter the command 'help'\n");
         return true;
     }
-    m_Interface.GetOstream() << m_Game;
+    m_Game.Print(m_Interface.GetOstream());
     return true;
 }
