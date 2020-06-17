@@ -44,7 +44,6 @@ bool CGame::InitializePlayerVsPlayer() {
     m_Black = std::make_unique<CPlayerHuman>(m_Interface, m_Board, EColor::BLACK);
 
     m_Initialized = true;
-    std::cout << *this;
     return true;
 }
 
@@ -91,8 +90,71 @@ std::ostream & operator<<(std::ostream & os, const CGame & self) {
     }
     else
         os << 'p';
+
+    key += difficulty;
     os << difficulty << ' ' << key << std::endl;
     return os;
+}
+
+std::istream & operator>>(std::istream & is, CGame & self) {
+    is >> self.m_Board;
+
+    int difficulty;
+    int key = 0;
+    int checkKey;
+    char playerOne;
+    char playerTwo;
+    char c;
+
+    if (!(is >> playerOne >> playerTwo >> difficulty >> c >> checkKey))
+        return is;
+
+    if (c != ' ') {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    if (0 >= difficulty || difficulty >= 6) {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    key += difficulty;
+
+    if (playerOne == 'c' && playerTwo == 'c') {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    if (playerOne == 'p' && playerTwo == 'p' && difficulty != 0) {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    if (playerOne == 'p')
+        self.m_White = std::make_unique<CPlayerHuman>(self.m_Interface, self.m_Board, EColor::WHITE);
+    else {
+        self.m_White = std::make_unique<CPlayerAI>(self.m_Interface, self.m_Board, EColor::WHITE, difficulty);
+        key |= 2;
+    }
+    if (playerTwo == 'p')
+        self.m_Black = std::make_unique<CPlayerHuman>(self.m_Interface, self.m_Board, EColor::BLACK);
+    else {
+        self.m_Black = std::make_unique<CPlayerAI>(self.m_Interface, self.m_Board, EColor::BLACK, difficulty);
+        key |= 1;
+    }
+
+    if (key != checkKey) {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    self.m_Initialized = true;
+    return is;
+}
+
+void CGame::Restart() {
+    m_Board.Restart();
 }
 
 

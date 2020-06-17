@@ -1,4 +1,3 @@
-#include <climits>
 /*
  * @author Hong Son Ngo <ngohongs@fit.cvut.cz>
  * @date 14/05/2020.
@@ -17,6 +16,8 @@
 #include <memory>
 #include <sstream>
 #include <random>
+#include <cinttypes>
+#include <climits>
 #include <fstream>
 #include "CPiece.h"
 #include "EColor.h"
@@ -165,9 +166,9 @@ public:
 
     friend std::ostream & operator<<(std::ostream & os, const CBoard & board);
 
-    bool Save(const std::string & path) const;
+    friend std::istream & operator>>(std::istream & is, CBoard & board);
 
-    bool Load(const std::string & path) const;
+    void Restart();
 };
 
 

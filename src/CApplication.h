@@ -17,6 +17,9 @@
 #include "CCommands/CCommandBoard.h"
 #include "CCommands/CCommandMove.h"
 #include "CCommands/CCommandPlay.h"
+#include "CCommands/CCommandSave.h"
+#include "CCommands/CCommandLoad.h"
+#include "CCommands/CCommandRestart.h"
 
 class CApplication {
 private:

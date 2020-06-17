@@ -11,10 +11,51 @@ CCommandMove::CCommandMove(const CInterface & interface, const char * help, CGam
 
 bool CCommandMove::Execute() {
     std::string bin;
+    std::string line;
+    if (m_Game.IsOver()) {
+        m_Interface.GetIstream() >> bin;
+        m_Interface.PromptMessage("Game is over. Do you want to restart the game [y/N]: ");
+        getline(m_Interface.GetIstream(), line);
+        getline(m_Interface.GetIstream(), line);
+        if (m_Interface.GetIstream().fail())
+            throw std::runtime_error("Error during reading input (loading).");
+
+        for (auto & i : line)
+            i = std::tolower(i);
+
+        if (line == "y" || line == "yes") {
+            m_Game.Restart();
+            return true;
+        }
+        else {
+            m_Interface.PromptMessage("\n");
+            return true;
+        }
+    }
+
     if (!m_Game.IsInitialized()) {
         m_Interface.GetIstream() >> bin;
         m_Interface.PromptMessage("Game is not initialzed yet, for help enter the command 'help'\n");
         return true;
     }
-    return m_Game.MakeTurn();
+    if (!m_Game.MakeTurn()) {
+        m_Interface.PromptMessage("Game is over. Do you want to restart the game [y/N]: ");
+        getline(m_Interface.GetIstream(), line);
+        getline(m_Interface.GetIstream(), line);
+        if (m_Interface.GetIstream().fail())
+            throw std::runtime_error("Error during reading input (loading).");
+
+        for (auto & i : line)
+            i = std::tolower(i);
+
+        if (line == "y" || line == "yes") {
+            m_Game.Restart();
+            return true;
+        }
+        else {
+            m_Interface.PromptMessage("\n");
+            return true;
+        }
+    }
+    return true;
 }

@@ -38,6 +38,8 @@ public:
 
     friend std::ostream & operator<<(std::ostream & os, const CHashKey & self);
 
+    friend std::istream & operator>>(std::istream & is, CHashKey & self);
+
 
 };
 

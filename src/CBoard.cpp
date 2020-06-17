@@ -9,15 +9,8 @@
 
 
 CBoard::CBoard() {
-
-    for (int i = 0; i < 120; i++)
-        m_Board[i] = std::make_shared<COffboard>(COffboard(*this, i));
-
     ReadFEN(CHECKMATE);
-//    assert(START_FEN == CreateFEN());
-    m_StateKey = m_HashKeys.GenerateStateKey(m_Board, m_Side, m_Castling, m_EnPassant);
-    m_HistoryKeys.emplace(m_StateKey, 1);
-    InitialScore();
+//   (START_FEN == CreateFEN());
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
@@ -51,6 +44,19 @@ std::ostream & CBoard::Print(std::ostream & os) const {
 }
 
 bool CBoard::ReadFEN(const std::string & fen) {
+    m_HistoryKeys = {};
+    m_WhiteScore = 0;
+    m_BlackScore = 0;
+    m_HistoryIndex = 0;
+    std::vector<CHistory> m_History = {};
+    m_Repetitions = false;
+
+    for (int i = 0; i < 120; i++)
+        m_Board[i] = std::make_shared<COffboard>(COffboard(*this, i));
+
+    for (int i = 0; i < 13; i++)
+        m_PiecesCount[i] = 0;
+
     std::istringstream iss(fen);
     std::string board;
     char whiteTurn;
@@ -72,8 +78,10 @@ bool CBoard::ReadFEN(const std::string & fen) {
                 case 'P':
                     m_Board[position] = std::make_shared<CPawn>(CPawn(*this, position, EColor::WHITE));
                     m_WhitePieces.push_back(m_Board[position]);
-                    if (++(m_PiecesCount[P]) > 10)
+                    if (++(m_PiecesCount[P]) > 10) {
+                        std::cout << "pawn\n";
                         return false;
+                    }
                     position++;
                     file++;
                     break;
@@ -122,8 +130,10 @@ bool CBoard::ReadFEN(const std::string & fen) {
                 case 'p':
                     m_Board[position] = std::make_shared<CPawn>(CPawn(*this, position, EColor::BLACK));
                     m_BlackPieces.push_back(m_Board[position]);
-                    if (++(m_PiecesCount[p]) > 10)
+                    if (++(m_PiecesCount[p]) > 10) {
+                        std::cout << "black PAwn " << m_PiecesCount[p] << std::endl;
                         return false;
+                    }
                     position++;
                     file++;
                     break;
@@ -242,6 +252,9 @@ bool CBoard::ReadFEN(const std::string & fen) {
         m_Turns = turn;
     else
         return false;
+
+    m_StateKey = m_HashKeys.GenerateStateKey(m_Board, m_Side, m_Castling, m_EnPassant);
+    m_HistoryKeys[m_StateKey] = 1;
     InitialScore();
     return true;
 }
@@ -859,17 +872,185 @@ bool CBoard::NoPossibleMoves() {
 
 std::ostream & operator<<(std::ostream & os, const CBoard & board) {
     os << board.CreateFEN() << std::endl;
-    int cnt = 0;
-    uint64_t key = 0;
-    uint64_t sum = 0;
+    int pawns = 0;
+    int knights = 0;
+    int bishops = 0;
+    int rooks = 0;
+    int queens = 0;
+
+    for (const auto & i : board.m_WhitePieces) {
+        switch (i->GetPiece()) {
+            case EPiece::PAWN:
+                pawns++;
+                break;
+            case EPiece::KNIGHT:
+                knights++;
+                break;
+            case EPiece::BISHOP:
+                bishops++;
+                break;
+            case EPiece::ROOK:
+                rooks++;
+                break;
+            case EPiece::QUEEN:
+                queens++;
+                break;
+        }
+    }
+    os << pawns << ' ' << knights << ' ' << bishops << ' ' << rooks << ' ' << queens << ' ' << board.m_WhitePieces.size() << std::endl;
+
+    pawns = 0;
+    knights = 0;
+    bishops = 0;
+    rooks = 0;
+    queens = 0;
+
+    for (const auto & i : board.m_BlackPieces) {
+        switch (i->GetPiece()) {
+            case EPiece::PAWN:
+                pawns++;
+                break;
+            case EPiece::KNIGHT:
+                knights++;
+                break;
+            case EPiece::BISHOP:
+                bishops++;
+                break;
+            case EPiece::ROOK:
+                rooks++;
+                break;
+            case EPiece::QUEEN:
+                queens++;
+                break;
+        }
+    }
+
+    os << pawns << ' ' << knights << ' ' << bishops << ' ' << rooks << ' ' << queens  << ' ' << board.m_BlackPieces.size() << std::endl;
+
     os << board.m_HashKeys;
     os << board.m_StateKey << std::endl;
+    os << board.m_HistoryKeys.size() << std::endl;
+
+    uint64_t key = 0;
+    uint64_t sum = 0;
+
     for (const auto & i : board.m_HistoryKeys) {
-        cnt++;
         key ^= i.first ^ i.second;
         sum += i.first + i.second;
-        os << i.first << " : " << i.second << std::endl;
+        os << i.first << ":" << i.second << std::endl;
     }
-    os << cnt << ' ' << key << ' ' << sum << std::endl;
+    os << key << ' ' << sum << std::endl;
     return os;
+}
+
+std::istream & operator>>(std::istream & is, CBoard & board) {
+    std::string line;
+    getline(is, line);
+    if (is.fail())
+        return is;
+
+    if (!board.ReadFEN(line) || board.CreateFEN() != line) {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    getline(is, line);
+    if (is.fail())
+        return is;
+
+    int pawns = 0;
+    int knights = 0;
+    int bishops = 0;
+    int rooks = 0;
+    int queens = 0;
+    int total = 0;
+
+    if (sscanf(line.c_str(),"%d %d %d %d %d %d", &pawns, &knights, &bishops, &rooks, &queens, &total) != 6 ||
+        pawns != board.m_PiecesCount[P] ||
+        knights != board.m_PiecesCount[N] ||
+        bishops != board.m_PiecesCount[B] ||
+        rooks != board.m_PiecesCount[R] ||
+        queens != board.m_PiecesCount[Q] ||
+        total != board.m_WhitePieces.size() ) {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    getline(is, line);
+    if (is.fail())
+        return is;
+
+    pawns = 0;
+    knights = 0;
+    bishops = 0;
+    rooks = 0;
+    queens = 0;
+    total = 0;
+
+    if (sscanf(line.c_str(),"%d %d %d %d %d %d", &pawns, &knights, &bishops, &rooks, &queens, &total) != 6 ||
+        pawns != board.m_PiecesCount[p] ||
+        knights != board.m_PiecesCount[n] ||
+        bishops != board.m_PiecesCount[b] ||
+        rooks != board.m_PiecesCount[r] ||
+        queens != board.m_PiecesCount[q] ||
+        total != board.m_BlackPieces.size() ) {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    if (!(is >> board.m_HashKeys))
+        return is;
+
+    if (!(is >> board.m_StateKey))
+        return is;
+
+    if (board.m_StateKey != board.m_HashKeys.GetStateKey()) {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    uint64_t cnt;
+
+    if (!(is >> cnt))
+        return is;
+
+    uint64_t key = 0;
+    uint64_t sum = 0;
+
+    uint64_t tmpFirst;
+    char c;
+    int tmpSecond;
+
+    for (uint64_t i = 0; i < cnt; i++) {
+        if (!(is >> tmpFirst >> c >> tmpSecond))
+            return is;
+
+        if (c != ':') {
+            is.setstate(std::ios::failbit);
+            return is;
+        }
+
+        key ^= tmpFirst ^ tmpSecond;
+        sum += tmpFirst + tmpSecond;
+        board.m_HistoryKeys[tmpFirst] = tmpSecond;
+    }
+
+    uint64_t checkKey = 0;
+    uint64_t checkSum = 0;
+
+    if (!(is >> checkKey >> c >> checkSum))
+        return is;
+
+    if (key != checkKey || c != ' ' || sum != checkSum) {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    return is;
+}
+
+void CBoard::Restart() {
+    if(!ReadFEN(START_FEN))
+        std::cout << "CHYBA" << std::endl;
+
 }

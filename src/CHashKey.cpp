@@ -36,7 +36,6 @@ uint64_t CHashKey::GenerateStateKey(const std::shared_ptr<CPiece> * board, EColo
     if (enPassant != EMPTY)
         stateKey ^= m_EnPassantKey[enPassant];
 
-    m_StateKey = stateKey;
     return stateKey;
 }
 
@@ -68,6 +67,7 @@ std::ostream & operator<<(std::ostream & os, const CHashKey & self) {
     uint64_t key = 0;
     uint64_t sum = 0;
     uint64_t finalKey = 0;
+
     for (int i = 0; i < 12; i++) {
         for (int j = 0; j < 120; j++) {
             os << self.m_PiecesKeys[i][j] << ' ';
@@ -96,8 +96,107 @@ std::ostream & operator<<(std::ostream & os, const CHashKey & self) {
 
     os << self.m_WhiteTurnKey << std::endl;
     finalKey ^= self.m_WhiteTurnKey;
+    sum += self.m_WhiteTurnKey;
+
+    os << self.m_StateKey << std::endl;
+    finalKey ^= self.m_StateKey;
+    sum += self.m_StateKey;
+
     os << finalKey << ' ' << sum << std::endl;
     return os;
+}
+
+std::istream & operator>>(std::istream & is, CHashKey & self) {
+    uint64_t key = 0;
+    uint64_t checkKey = 0;
+    uint64_t sum = 0;
+    uint64_t finalKey = 0;
+
+    for (int i = 0; i < 12; i++) {
+        for (int j = 0; j < 120; j++) {
+            if (!(is >> self.m_PiecesKeys[i][j]))
+                return is;
+            key ^= self.m_PiecesKeys[i][j];
+            finalKey ^= self.m_PiecesKeys[i][j];
+            sum += self.m_PiecesKeys[i][j];
+        }
+    }
+
+    if (!(is >> checkKey))
+        return is;
+
+    if (key != checkKey) {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    key = 0;
+
+    for (int i = 0; i < 16; i++) {
+        if(!(is >> self.m_CastlingKeys[i]))
+            return is;
+        key ^= self.m_CastlingKeys[i];
+        finalKey ^= self.m_CastlingKeys[i];
+        sum += self.m_CastlingKeys[i];
+    }
+
+    if (!(is >> checkKey))
+        return is;
+
+    if (key != checkKey) {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    key = 0;
+
+    for (int i = 0; i < 120; i++) {
+        if (!(is >> self.m_EnPassantKey[i]))
+            return is;
+        key ^= self.m_EnPassantKey[i];
+        finalKey ^= self.m_EnPassantKey[i];
+        sum += self.m_EnPassantKey[i];
+    }
+
+    if (!(is >> checkKey))
+        return is;
+
+    if (key != checkKey) {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    if (!(is >> self.m_WhiteTurnKey))
+        return is;
+
+    finalKey ^= self.m_WhiteTurnKey;
+    sum += self.m_WhiteTurnKey;
+
+
+    if (!(is >> self.m_StateKey))
+        return is;
+
+    finalKey ^= self.m_StateKey;
+    sum += self.m_StateKey;
+
+    if (!(is >> checkKey))
+        return is;
+
+    if (finalKey != checkKey) {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    if (!(is >> checkKey))
+        return is;
+
+    if (sum != checkKey) {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+
+    return is;
 }
 
 

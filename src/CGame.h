@@ -52,6 +52,10 @@ public:
     }
 
     friend std::ostream & operator<<(std::ostream & os, const CGame & self);
+
+    friend std::istream & operator>>(std::istream & is, CGame & self);
+
+    void Restart();
 };
 
 
