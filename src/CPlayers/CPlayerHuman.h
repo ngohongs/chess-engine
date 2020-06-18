@@ -14,11 +14,18 @@
 
 class CBoard;
 
+/**
+ * Class representing a human player
+ */
 class CPlayerHuman : public CPlayer {
 private:
 public:
     CPlayerHuman(CInterface & interface,CBoard & board, EColor color);
 
+    /**
+     * Ask the player for a move
+     * @return true if the game is still in play, else false if the game has ended
+     */
     bool TakeTurn() override;
 };
 

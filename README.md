@@ -31,38 +31,33 @@ Kde lze využít polymorfismus? (doporučené)
 
 Šachy budou mít konzolové uživatelské rozhraní. Po spuštění se hra bude ovládat těmito příkazy.
 
-- `play ...` vytvoří hru, program se dotáže, jestli se jedná o hru proti počítači a jeho obtížnost,
-nebo o hru s dalším hráčem
+- `play [p|c][p|c][1|2|3|4|5]` vytvoří hru, první pozice je bílý hráč, druhý černý. `p` znamená hráč, `c` je počítač. Při hře proti počítači je nutno dopsat obtižnost od 1-5.                
 - `save [filename]` uloží rozehranou hru do souboru (`filename`)
 - `load [filnename]` načte uloženou hru ze souboru (`filename`)
 - `board` zobrazí stav herní desky
-- `move [source_x][source_y] [target_x][target_y]` přesune figurku z pozice (`source_x`,`source_y`) na pozici (`target_x`,`target_y`)
+- `move [source_x][source_y][target_x][target_y][q|r|b|n]` přesune figurku z pozice (`source_x`,`source_y`) na pozici (`target_x`,`target_y`), jestli se jedná o proměnu pěšce, musí být dodána figurka, v kterou se pěšec promění.
+- `restart` resetuje hru
 - `help` zobrazí nápovědu
 - `quit` ukončí program
 
-Výstup aplikace může vypadat takto. Znak dolar značí vstup uživatele.
+Výstup aplikace může vypadat takto. Znak dolar značí vstup uživatele. Černé figurky jsou označeny malými pismeny, bílé velkými.
 ```
-Zadejte příkaz, pro nápovědu příkaz help:
+Enter a command, for help enter the command 'help':
 $ board
-  A   B   C   D   E   F   G   H
-+---+---+---+---+---+---+---+---+
-|B R|B N|B B|B Q|B K|B B|B N|B R| 1
-+---+---+---+---+---+---+---+---+
-|B P|B P|B P|B P|B P|B P|B P|B P| 2
-+---+---+---+---+---+---+---+---+
-|   |   |   |   |   |   |   |   | 3
-+---+---+---+---+---+---+---+---+
-|   |   |   |   |   |   |   |   | 4
-+---+---+---+---+---+---+---+---+
-|   |   |   |   |   |   |   |   | 5
-+---+---+---+---+---+---+---+---+
-|   |   |   |   |   |   |   |   | 6
-+---+---+---+---+---+---+---+---+
-|W P|W P|W P|W P|W P|W P|W P|W P| 7
-+---+---+---+---+---+---+---+---+
-|W R|W N|W B|W Q|W K|W B|W N|W R| 8
-+---+---+---+---+---+---+---+---+
-Zadejte příkaz, pro nápovědu příkaz help:
+Side to turn: WHITE
+    A B C D E F G H
+  +-----------------+
+8 | r n b q k b n r | 8
+7 | p p p p p p p p | 7
+6 | . . . . . . . . | 6
+5 | . . . . . . . . | 5
+4 | . . . . . . . . | 4
+3 | . . . . . . . . | 3
+2 | P P P P P P P P | 2
+1 | R N B Q K B N R | 1
+  +-----------------+
+    A B C D E F G H
+Enter a command, for help enter the command 'help':
 ```
 
 Celá aplikace bude řízena třídou `CApplication`, která se stará oběh hry a interaktuje s uživatelem. Tato třída bude obsahovat třídu `CGame`, která reprezentuje jednu konkretní hru, hlavním účelem třídy je ukládání hry. `CGame` drží herní desku `CBoard` a dva objekty třídy `CPlayer`, které budou představovat dva hráče. `CBoard` je třída, ve které jsou zasazeny objekty třídy `CPiece`.

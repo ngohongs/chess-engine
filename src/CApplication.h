@@ -21,10 +21,17 @@
 #include "CCommands/CCommandLoad.h"
 #include "CCommands/CCommandRestart.h"
 
+
+/**
+ * Class representing an application
+ */
 class CApplication {
 private:
+    // All commands
     std::map<std::string, std::unique_ptr<CCommand>> m_Commands;
+
     CInterface m_Interface;
+
     CGame m_Game;
 public:
     explicit CApplication(const CInterface & interface);

@@ -8,10 +8,14 @@
 #include <string>
 #include "CInterface.h"
 
-
+/**
+ * Abstract class CCommand representing a command
+ */
 class CCommand {
 protected:
     CInterface m_Interface;
+
+    // Help text
     std::string m_Help;
 public:
     explicit CCommand(const CInterface &interface, const char * help)

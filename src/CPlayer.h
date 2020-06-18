@@ -7,23 +7,36 @@
 
 #include <list>
 #include "CInterface.h"
-#include "CMove.h"
 #include "EColor.h"
 #include "CBoard.h"
 
 
+/**
+ * Abstract class CPlayer representing a player in a game
+ */
 class CPlayer {
 protected:
-    EColor m_Side = EColor::WHITE;
-    CBoard & m_Board;
     CInterface & m_Interface;
+
+    CBoard & m_Board;
+
+    // Side for the player
+    EColor m_Side = EColor::WHITE;
+
+    // If the player is AI
     bool m_Computer = false;
+
+    // Difficulty upto 5 for AI, if the players is a person 0
     int m_Difficulty = 0;
 public:
-    CPlayer(CInterface & interface, CBoard & board, EColor side, bool computer, int difficulty);
+    explicit CPlayer(CInterface & interface, CBoard & board, EColor side, bool computer, int difficulty);
 
     virtual ~CPlayer() = default;
 
+    /**
+     * Takes a turn in game
+     * @return true if game has not ended, else false
+     */
     virtual bool TakeTurn() = 0;
 
     int GetDifficulty() const {

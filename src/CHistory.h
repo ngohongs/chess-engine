@@ -5,16 +5,30 @@
 
 #pragma once
 
-
 #include "CMove.h"
-struct CHistory {
-    CHistory() {}
+#include "EConst.h"
 
+
+/**
+ * Structure for saving state of the CBoard
+ */
+struct CHistory {
+    CHistory() = default;
+
+    // Move made in this state of CBoard
     CMove m_Move;
-    unsigned int m_Castling;
-    int m_EnPassant;
-    int m_FiftyTurns;
-    uint64_t m_StateKey;
+
+    // Castling permission
+    unsigned int m_Castling = NO_CASTLE;
+
+    // En Passant square
+    int m_EnPassant = OFFBOARD;
+
+    // Fifty moves counter
+    int m_FiftyTurns = 0;
+
+    // State key of the CBoard
+    uint64_t m_StateKey = 0;
 };
 
 

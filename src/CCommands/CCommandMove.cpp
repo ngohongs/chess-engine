@@ -18,7 +18,7 @@ bool CCommandMove::Execute() {
         getline(m_Interface.GetIstream(), line);
         getline(m_Interface.GetIstream(), line);
         if (m_Interface.GetIstream().fail())
-            throw std::runtime_error("Error during reading input (loading).");
+            throw std::runtime_error("Error during reading input (move).");
 
         for (auto & i : line)
             i = std::tolower(i);
@@ -35,7 +35,7 @@ bool CCommandMove::Execute() {
 
     if (!m_Game.IsInitialized()) {
         m_Interface.GetIstream() >> bin;
-        m_Interface.PromptMessage("Game is not initialzed yet, for help enter the command 'help'\n");
+        m_Interface.PromptMessage("Game is not initialized yet.\n");
         return true;
     }
     if (!m_Game.MakeTurn()) {

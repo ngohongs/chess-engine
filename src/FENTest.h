@@ -6,6 +6,8 @@
 #pragma once
 
 
+// TODO comment each test
+
 const char * const FEN1 = "6r1/Pr1p1P2/1q3p1K/4k2p/2B4b/1P6/3RN1p1/8 w - a1 0 1";
 const char * const FEN2 = "8/3N1Q1p/1p1K2p1/3PN1B1/3k1r2/n2P1P2/3p3P/8 w - - 0 1";
 const char * const FEN3 = "3nQ3/2K5/1rp2P2/6p1/2N3P1/1p4Pb/2k5/b5rR w - - 0 1";
@@ -37,5 +39,7 @@ const char * const MATEIN3 = "2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 
 const char * const AITEST1 = "r1b1k2r/ppppnppp/2n2q2/2b5/3NP3/2P1B3/PP3PPP/RN1QKB1R w KQkq - 0 1";
 const char * const EVALUATE1 = "r1b1k2r/ppp1nppp/2p2q2/8/4P3/2P1P3/PP4PP/RN1QKB1R w KQkq - 0 1";
 const char * const EVALUATE2 = "r1b1k2r/ppp1nppp/2p2q2/2B5/4P3/2P5/PP3PPP/RN1QKB1R b KQkq - 0 1";
-const char * const CHECKMATE = "rnb1k1nr/pppp1ppp/8/2b1pq2/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1";
+const char * const CHECKMATEANDDRAW = "rnb1k1nr/pppp1ppp/8/2b1pq2/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 99 49";
+const char * const CHECKMATE = "rnb1k1nr/pppp1ppp/8/2b1pq2/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1";
+const char * const CHECKMATEBLACK = "rnb1k1nr/pppp1ppp/8/2b1pq2/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1";
 

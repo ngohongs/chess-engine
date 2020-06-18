@@ -14,6 +14,10 @@ private:
 public:
     CCommandPlay(const CInterface & interface, const char * help, CGame & game);
 
+    /**
+     * Initialize a game
+     * @return true
+     */
     bool Execute() override;
 };
 

@@ -13,10 +13,12 @@ CMove::CMove(EColor color, int from, int to, EPiece capture, bool pawnStart, boo
 }
 
 std::ostream & CMove::Print(std::ostream & os) const {
+    // for debugging purposes
 //    os << (m_Side == EColor::WHITE ? 'w' : 'b');
     os << IndexToTile(m_From) << IndexToTile(m_To);
     if (m_Promotion != EPiece::EMPTY)
         os << m_Promotion;
+    // for debugging purposes
 //    else
 //        os << '-';
 //
@@ -42,6 +44,10 @@ std::istream & operator>>(std::istream & is, CMove & self) {
 
     if (is.eof())
         return is;
+
+    if (is.fail())
+        return is;
+
     input.push_back('\n');
 
     char fromFile;
@@ -63,6 +69,7 @@ std::istream & operator>>(std::istream & is, CMove & self) {
     to.push_back(toFile);
     to.push_back(toRank);
 
+    // if the from and to coordinates are out of bounds
     if (TileToIndex(from) == OFFBOARD || TileToIndex(to) == OFFBOARD) {
         is.setstate(std::ios::failbit);
         return is;
@@ -71,10 +78,11 @@ std::istream & operator>>(std::istream & is, CMove & self) {
     self.m_From = TileToIndex(from);
     self.m_To = TileToIndex(to);
 
+    // it is not a promotion move
     if (promotion == '\n')
         return is;
 
-
+    // if promotion is not a valid piece
     if (promotion != 'q' && promotion != 'r' && promotion != 'b' && promotion != 'n') {
         is.setstate(std::ios::failbit);
         return is;
@@ -100,10 +108,6 @@ bool CMove::operator==(const CMove & other) const {
     if (m_Promotion != other.m_Promotion)
         return false;
     return true;
-}
-
-bool CMove::IsValid() const {
-    return m_From != OFFBOARD && m_To != OFFBOARD;
 }
 
 bool CMove::ExactMatch(const CMove & other) const {
@@ -133,7 +137,8 @@ CMove PushMove(EColor color, int from, int to) {
 CMove PromotionMove(EPiece piece, EColor color, int from, int to, EPiece capture, EPiece promotion) {
     if (capture == EPiece::EMPTY)
         return CMove(color, from, to, capture, false, false, promotion, false, 0);
-    return CMove(color, from, to, capture, false, false, promotion, false, CAPTURE_SCORE[EPieceToCode(capture)] + 6 - ( CAPTURE_SCORE[EPieceToCode(piece)] / 100) + 1000000);
+    return CMove(color, from, to, capture, false, false, promotion, false,
+            CAPTURE_SCORE[EPieceToCode(capture)] + 6 - ( CAPTURE_SCORE[EPieceToCode(piece)] / 100) + 1000000);
 }
 
 CMove PawnTwoForward(EColor color, int from, int to) {
@@ -141,7 +146,8 @@ CMove PawnTwoForward(EColor color, int from, int to) {
 }
 
 CMove CaptureMove(EPiece piece, EColor color, int from, int to, EPiece capture, bool enPassant) {
-    return CMove(color, from, to, capture, false, enPassant, EPiece::EMPTY, false, CAPTURE_SCORE[EPieceToCode(capture)] + 6 - ( CAPTURE_SCORE[EPieceToCode(piece)] / 100) + 1000000);
+    return CMove(color, from, to, capture, false, enPassant, EPiece::EMPTY, false,
+            CAPTURE_SCORE[EPieceToCode(capture)] + 6 - ( CAPTURE_SCORE[EPieceToCode(piece)] / 100) + 1000000);
 }
 
 CMove CastleMove(EColor color, int castling) {

@@ -22,7 +22,8 @@ std::list<CMove> CRook::MoveList() const {
     EColor oppositeSide = OppositeSide(m_Color);
     EPiece piece;
     EColor color;
-    //Rook attacks
+    // Rook attacks
+    // For each direction go until a capture or border
     for (int i : ROOK_ATTACKS) {
         tempTile = m_Coord + i;
         while (!m_Board.IsOffboard(tempTile)) {
@@ -43,6 +44,7 @@ std::list<CMove> CRook::MoveList() const {
     return moveList;
 }
 
+// Same as MoveList only for captures
 std::list<CMove> CRook::CaptureMoveList() const {
     std::list<CMove> moveList;
     int tempTile;

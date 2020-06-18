@@ -14,6 +14,10 @@ private:
 public:
     CCommandMove(const CInterface & interface, const char * help, CGame & game);
 
+    /**
+     * Make a move
+     * @return true
+     */
     bool Execute() override;
 };
 

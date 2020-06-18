@@ -36,7 +36,7 @@ bool CCommandLoad::Execute() {
     file.open(path, std::ios::in | std::ios::binary);
 
     if (file.fail()) {
-        m_Interface.PromptMessage("Error during opening save file\n");
+        m_Interface.PromptMessage("Error during opening save file.\n");
         return true;
     }
 

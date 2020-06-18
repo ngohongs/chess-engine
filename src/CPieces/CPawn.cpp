@@ -92,12 +92,16 @@ std::list<CMove> CPawn::MoveList() const {
 std::list<CMove> CPawn::CaptureMoveList() const {
     std::list<CMove> moveList;
 
-    int forward = m_Color == EColor::WHITE ? 10 : -10;
+    // Diagonal attacks for pawn
     int diagonalOne = m_Color == EColor::WHITE ? 9 : -9;
     int diagonalTwo = m_Color == EColor::WHITE ? 11 : -11;
+
+    // Opposite side
     EColor oppositeSide = OppositeSide(m_Color);
-    int startRank = m_Color == EColor::WHITE ? RANK_2 : RANK_7;
+
+    // Starting ranks for pawn
     int promotionRank = m_Color == EColor::WHITE ? RANK_7 : RANK_2;
+
     //Capture moves
     if (!m_Board.IsOffboard(m_Coord + diagonalOne) && m_Board[m_Coord + diagonalOne]->GetColor() == oppositeSide) {
         if (GetRank(m_Coord) == promotionRank) {
@@ -143,5 +147,6 @@ std::list<CMove> CPawn::CaptureMoveList() const {
         moveList.push_back(CaptureMove(m_Piece, m_Color, m_Coord, m_Coord + diagonalOne, EPiece::PAWN, true));
     if (m_Coord + diagonalTwo == m_Board.GetEnPassant())
         moveList.push_back(CaptureMove(m_Piece, m_Color, m_Coord, m_Coord + diagonalTwo, EPiece::PAWN, true));
+
     return moveList;
 }

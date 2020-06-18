@@ -22,7 +22,7 @@ bool CPlayerHuman::TakeTurn() {
         return false;
 
     if (m_Interface.GetIstream().fail()) {
-        m_Interface.PromptMessage("Invalid move, for help enter the command 'help'\n");
+        m_Interface.PromptMessage("Invalid move.\n");
         m_Interface.Clear();
         return true;
     }
@@ -31,14 +31,17 @@ bool CPlayerHuman::TakeTurn() {
     for (const auto & i : moveList) {
         if (move == i) {
             if (!m_Board.MakeMove(i)) {
-                m_Interface.PromptMessage("Illegal move, your king will be in check\n");
+                m_Interface.PromptMessage("Illegal move, your king will be in check.\n");
                 break;
             }
 
-            m_Interface.GetOstream() << '\n' << m_Side << "'s move p: " << i << '\n' << std::endl;
+            m_Interface.GetOstream() << '\n' << m_Side << "'s move: " << i << '\n' << std::endl;
+            m_Board.Print(m_Interface.GetOstream());
             if (m_Board.IsInCheck()) {
                 if (m_Board.NoPossibleMoves()) {
-                    m_Interface.PromptMessage("Checkmate\n");
+                    m_Interface.PromptMessage("Checkmate ");
+                    if (!(m_Interface.GetOstream() << m_Side << " won\n"))
+                        throw std::runtime_error("Error during outputting result");
                     return false;
                 }
                 m_Interface.PromptMessage("Check\n");

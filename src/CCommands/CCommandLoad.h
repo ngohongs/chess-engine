@@ -16,6 +16,10 @@ private:
 public:
     CCommandLoad(const CInterface & interface, const char * help, CGame & game);
 
+    /**
+     * Load a game
+     * @return true
+     */
     bool Execute() override;
 };
 

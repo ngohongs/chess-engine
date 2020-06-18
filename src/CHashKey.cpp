@@ -5,6 +5,9 @@
 
 #include "CHashKey.h"
 
+CHashKey::CHashKey() {
+    InitiateHashKeys();
+}
 
 void CHashKey::InitiateHashKeys() {
     std::random_device seed;
@@ -22,6 +25,7 @@ void CHashKey::InitiateHashKeys() {
 }
 
 uint64_t CHashKey::GenerateStateKey(const std::shared_ptr<CPiece> * board, EColor side, unsigned castling, int enPassant) {
+    // xor state key with piece key at its position
     uint64_t stateKey = 0;
     for (int i = 0; i < 8; i++)
         for (int j = A1; j <= H1; j++)
@@ -36,11 +40,8 @@ uint64_t CHashKey::GenerateStateKey(const std::shared_ptr<CPiece> * board, EColo
     if (enPassant != EMPTY)
         stateKey ^= m_EnPassantKey[enPassant];
 
+    m_StateKey = stateKey;
     return stateKey;
-}
-
-CHashKey::CHashKey() {
-    InitiateHashKeys();
 }
 
 uint64_t CHashKey::HashPiece(int pieceCode, int tile) {
@@ -51,7 +52,7 @@ uint64_t CHashKey::HashCastling(unsigned int castling) {
     return m_StateKey ^= m_CastlingKeys[castling];
 }
 
-uint64_t CHashKey::HashSide(EColor color) {
+uint64_t CHashKey::HashSide() {
     return m_StateKey ^= m_WhiteTurnKey;
 }
 
@@ -59,15 +60,15 @@ uint64_t CHashKey::HashEnPassant(int tile) {
     return m_StateKey ^= m_EnPassantKey[tile];
 }
 
-uint64_t CHashKey::GetStateKey() const {
-    return m_StateKey;
-}
-
 std::ostream & operator<<(std::ostream & os, const CHashKey & self) {
+    // for checking when loading CHashKey
     uint64_t key = 0;
+    // for checking when loading CHashKey
     uint64_t sum = 0;
+    // for checking when loading CHashKey
     uint64_t finalKey = 0;
 
+    // output every key to stream
     for (int i = 0; i < 12; i++) {
         for (int j = 0; j < 120; j++) {
             os << self.m_PiecesKeys[i][j] << ' ';
@@ -76,7 +77,9 @@ std::ostream & operator<<(std::ostream & os, const CHashKey & self) {
             sum += self.m_PiecesKeys[i][j];
         }
     }
+    // key for the line, used for checking when loading
     os << key << std::endl;
+
     key = 0;
     for (int i = 0; i < 16; i++) {
         os << self.m_CastlingKeys[i] << ' ';
@@ -85,6 +88,7 @@ std::ostream & operator<<(std::ostream & os, const CHashKey & self) {
         sum += self.m_CastlingKeys[i];
     }
     os << key << std::endl;
+
     key = 0;
     for (int i = 0; i < 120; i++) {
         os << self.m_EnPassantKey[i] << ' ';
@@ -102,14 +106,19 @@ std::ostream & operator<<(std::ostream & os, const CHashKey & self) {
     finalKey ^= self.m_StateKey;
     sum += self.m_StateKey;
 
+    // key for checking inputting this CHashKey
     os << finalKey << ' ' << sum << std::endl;
     return os;
 }
 
 std::istream & operator>>(std::istream & is, CHashKey & self) {
+    // key for checking if the loading was successful
     uint64_t key = 0;
+    // key for checking if the loading was successful
     uint64_t checkKey = 0;
+    // key for checking if the loading was successful
     uint64_t sum = 0;
+    // key for checking if the loading was successful
     uint64_t finalKey = 0;
 
     for (int i = 0; i < 12; i++) {
@@ -125,13 +134,13 @@ std::istream & operator>>(std::istream & is, CHashKey & self) {
     if (!(is >> checkKey))
         return is;
 
+    // if the keys do not match, file was overwritten
     if (key != checkKey) {
         is.setstate(std::ios::failbit);
         return is;
     }
 
     key = 0;
-
     for (int i = 0; i < 16; i++) {
         if(!(is >> self.m_CastlingKeys[i]))
             return is;
@@ -143,13 +152,13 @@ std::istream & operator>>(std::istream & is, CHashKey & self) {
     if (!(is >> checkKey))
         return is;
 
+    // if the keys do not match, file was overwritten
     if (key != checkKey) {
         is.setstate(std::ios::failbit);
         return is;
     }
 
     key = 0;
-
     for (int i = 0; i < 120; i++) {
         if (!(is >> self.m_EnPassantKey[i]))
             return is;
@@ -161,6 +170,7 @@ std::istream & operator>>(std::istream & is, CHashKey & self) {
     if (!(is >> checkKey))
         return is;
 
+    // if the keys do not match, file was overwritten
     if (key != checkKey) {
         is.setstate(std::ios::failbit);
         return is;
@@ -182,6 +192,7 @@ std::istream & operator>>(std::istream & is, CHashKey & self) {
     if (!(is >> checkKey))
         return is;
 
+    // if the keys do not match, file was overwritten
     if (finalKey != checkKey) {
         is.setstate(std::ios::failbit);
         return is;
@@ -190,6 +201,7 @@ std::istream & operator>>(std::istream & is, CHashKey & self) {
     if (!(is >> checkKey))
         return is;
 
+    // if the keys do not match, file was overwritten
     if (sum != checkKey) {
         is.setstate(std::ios::failbit);
         return is;

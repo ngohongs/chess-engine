@@ -22,7 +22,9 @@ std::list<CMove> CBishop::MoveList() const {
     EColor oppositeSide = OppositeSide(m_Color);
     EPiece piece;
     EColor color;
-    //Rook attacks
+    // Bishop attacks
+    // Go through all bishop move pattern
+    // For each direction until a capture or border
     for (int i : BISHOP_ATTACKS) {
         tempTile = m_Coord + i;
         while (!m_Board.IsOffboard(tempTile)) {

@@ -19,6 +19,7 @@ std::ostream & CKnight::Print(std::ostream & os) const {
 std::list<CMove> CKnight::MoveList() const {
     std::list<CMove> moveList;
     EColor oppositeSide = OppositeSide(m_Color);
+    // Go through all knight pattern moves
     for (const auto & i : KNIGHT_ATTACKS) {
         if (m_Board.IsOffboard(m_Coord + i))
             continue;
@@ -32,7 +33,7 @@ std::list<CMove> CKnight::MoveList() const {
     }
     return moveList;
 }
-
+// Same as MoveList only for captures
 std::list<CMove> CKnight::CaptureMoveList() const {
     std::list<CMove> moveList;
     EColor oppositeSide = OppositeSide(m_Color);

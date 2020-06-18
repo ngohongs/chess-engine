@@ -40,6 +40,6 @@ int EPieceToCode(EPiece piece) {
         case EPiece::KING:
             return 5;
         default:
-            throw std::logic_error("No code for empty or offboard");
+            throw std::logic_error("No code for EMPTY or OFFBOARD");
     }
 }

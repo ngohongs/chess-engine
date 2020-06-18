@@ -16,8 +16,11 @@ private:
 public:
     CCommandSave(const CInterface & interface, const char * help, CGame & game);
 
+    /**
+     * Saves the game
+     * @return true
+     */
     bool Execute() override;
-
 };
 
 

@@ -11,7 +11,7 @@ CCommandBoard::CCommandBoard(const CInterface & interface, const char * help, CG
 
 bool CCommandBoard::Execute() {
     if (!m_Game.IsInitialized()) {
-        m_Interface.PromptMessage("Game is not initialzed yet, for help enter the command 'help'\n");
+        m_Interface.PromptMessage("Game is not initialzed yet.\n");
         return true;
     }
     m_Game.Print(m_Interface.GetOstream());

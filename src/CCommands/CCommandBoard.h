@@ -7,7 +7,7 @@
 
 #include "../CCommand.h"
 #include "../CGame.h"
-#include "../CBoard.h"
+
 
 class CCommandBoard : public CCommand {
 private:
@@ -15,6 +15,10 @@ private:
 public:
     CCommandBoard(const CInterface & interface, const char * help, CGame & game);
 
+    /**
+     * Shows the board
+     * @return true
+     */
     bool Execute() override;
 };
 

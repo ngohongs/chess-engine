@@ -11,6 +11,7 @@ CCommandSave::CCommandSave(const CInterface & interface, const char * help, CGam
 
 bool CCommandSave::Execute() {
     std::string bin;
+    // If game is not initialized yet
     if (!m_Game.IsInitialized()) {
         m_Interface.GetIstream() >> bin;
         m_Interface.PromptMessage("Game is not initialized yet.\n");

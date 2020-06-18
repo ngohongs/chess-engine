@@ -1,5 +1,3 @@
-#include <climits>
-#include <iomanip>
 /*
  * @author Hong Son Ngo <ngohongs@fit.cvut.cz>
  * @date 14/05/2020.
@@ -9,12 +7,10 @@
 
 
 CBoard::CBoard() {
-    ReadFEN(CHECKMATE);
-//   (START_FEN == CreateFEN());
+    ReadFEN(START_FEN);
 }
 
 std::ostream & CBoard::Print(std::ostream & os) const {
-//    if (m_Side == EColor::WHITE) {
     os << "    A B C D E F G H" << std::endl;
     os << "  +-----------------+" << std::endl;
     for (int i = 7; i >= 0; i--) {
@@ -26,20 +22,6 @@ std::ostream & CBoard::Print(std::ostream & os) const {
     }
     os << "  +-----------------+" << std::endl;
     os << "    A B C D E F G H" << std::endl;
-//    }
-//    else {
-//        os << "    A B C D E F G H" << std::endl;
-//        os << "  +-----------------+" << std::endl;
-//        for (int i = 0; i <= 7; i++) {
-//            os << i + 1 << " | ";
-//            for (int j = A1; j <= H1; j++) {
-//                os << *m_Board[j + i * 10] << ' ';
-//            }
-//            os << "| " << i + 1 << std::endl;
-//        }
-//        os << "  +-----------------+" << std::endl;
-//        os << "    A B C D E F G H" << std::endl;
-//    }
     return os;
 }
 
@@ -50,6 +32,13 @@ bool CBoard::ReadFEN(const std::string & fen) {
     m_HistoryIndex = 0;
     std::vector<CHistory> m_History = {};
     m_Repetitions = false;
+    m_WhitePieces = {};
+    m_BlackPieces = {};
+    m_Plies = 0;
+    m_Plies = 0;
+    m_Turns = 1;
+    m_FiftyTurns = 0;
+
 
     for (int i = 0; i < 120; i++)
         m_Board[i] = std::make_shared<COffboard>(COffboard(*this, i));
@@ -78,10 +67,8 @@ bool CBoard::ReadFEN(const std::string & fen) {
                 case 'P':
                     m_Board[position] = std::make_shared<CPawn>(CPawn(*this, position, EColor::WHITE));
                     m_WhitePieces.push_back(m_Board[position]);
-                    if (++(m_PiecesCount[P]) > 10) {
-                        std::cout << "pawn\n";
+                    if (++(m_PiecesCount[P]) > 10)
                         return false;
-                    }
                     position++;
                     file++;
                     break;
@@ -130,10 +117,8 @@ bool CBoard::ReadFEN(const std::string & fen) {
                 case 'p':
                     m_Board[position] = std::make_shared<CPawn>(CPawn(*this, position, EColor::BLACK));
                     m_BlackPieces.push_back(m_Board[position]);
-                    if (++(m_PiecesCount[p]) > 10) {
-                        std::cout << "black PAwn " << m_PiecesCount[p] << std::endl;
+                    if (++(m_PiecesCount[p]) > 10)
                         return false;
-                    }
                     position++;
                     file++;
                     break;
@@ -245,12 +230,16 @@ bool CBoard::ReadFEN(const std::string & fen) {
         return false;
 
     if (ply >= 0)
-        m_Plies = ply;
+        m_FiftyTurns = ply / 2;
     else
         return false;
     if (turn >= 1)
         m_Turns = turn;
     else
+        return false;
+
+    // Check for the order of castling permissions
+    if (fen != CreateFEN())
         return false;
 
     m_StateKey = m_HashKeys.GenerateStateKey(m_Board, m_Side, m_Castling, m_EnPassant);
@@ -260,16 +249,8 @@ bool CBoard::ReadFEN(const std::string & fen) {
 }
 
 void CBoard::PrintState() const {
-//    int rank = -1;
-//    std::cout << "   -ABCDEFGH-" << std::endl;
-//    for (int i = 0; i < 12; i++) {
-//        std::cout << std::setw(2) << rank++ << " ";
-//        for (int j = 0; j < 10; j++) {
-//            m_Board[i * 10 + j]->Print(std::cout);
-//        }
-//        std::cout << '\n';
-//    }
     Print(std::cout);
+    std::cout << "Fifty moves: " << m_FiftyTurns << std::endl;
     std::cout << "side: " << (m_Side != EColor::WHITE ? 'w' : 'b') << std::endl;
     std::cout << "En Passant: " << IndexToTile(m_EnPassant) << std::endl;
     std::cout << "Castling: " << (m_Castling & 0x8U ? "K" : "") << (m_Castling & 0x4U ? "Q" : "")
@@ -328,8 +309,10 @@ std::string CBoard::CreateFEN() const {
 }
 
 bool CBoard::TileAttacked(EColor attacker, int tile) const {
+    // check all possible attacking patterns
+    // if one of the square on the pattern is piece of opposite side with the attacking patern return true
+
     // Pawn attacking
-//    EColor attacker = OppositeSide(m_Side);
     if (attacker == EColor::WHITE) {
         if (m_Board[tile - 9]->GetCode() == P || m_Board[tile - 11]->GetCode() == P)
             return true;
@@ -368,15 +351,11 @@ bool CBoard::TileAttacked(EColor attacker, int tile) const {
         while (!IsOffboard(tempTile)) {
             piece = m_Board[tempTile]->GetPiece();
             color = m_Board[tempTile]->GetColor();
-//            std::cout << IndexToTile(tempTile) << " ";
             if (piece != EPiece::EMPTY) {
                 if ((piece == EPiece::BISHOP || piece == EPiece::QUEEN) && color == attacker)
-//                    std::cout << "YES" << std::endl;
                     return true;
-//                    std::cout << std::endl;
                 break;
             }
-//            std::cout << std::endl;
             tempTile += i;
         }
     }
@@ -390,23 +369,6 @@ bool CBoard::TileAttacked(EColor attacker, int tile) const {
     return false;
 }
 
-void CBoard::TilesAttackedBy(EColor attacker) const {
-    std::cout << "    A B C D E F G H" << std::endl;
-    std::cout << "  +-----------------+" << std::endl;
-    for (int i = 7; i >= 0; i--) {
-        std::cout << i + 1 << " | ";
-        for (int j = A1; j <= H1; j++) {
-            if (TileAttacked(attacker ,j + i * 10))
-                std::cout << "X ";
-            else
-                std::cout << ". ";
-        }
-        std::cout << "| " << i + 1 << std::endl;
-    }
-    std::cout << "  +-----------------+" << std::endl;
-    std::cout << "    A B C D E F G H" << std::endl;
-}
-
 const std::shared_ptr<CPiece> & CBoard::operator[](int index) const {
     return m_Board[index];
 }
@@ -415,26 +377,16 @@ std::shared_ptr<CPiece> & CBoard::operator[](int index) {
     return m_Board[index];
 }
 
-bool CBoard::IsEmpty(int index) const {
-    return m_Board[index]->GetPiece() == EPiece::EMPTY;
-}
-
-bool CBoard::IsOffboard(int index) const {
-    return m_Board[index]->GetPiece() == EPiece::OFFBOARD;
-}
-
 bool CBoard::RemovePiece(int index) {
     EColor targetColor = m_Board[index]->GetColor();
     int targetCode = m_Board[index]->GetCode();
     if (--(m_PiecesCount[targetCode]) < 0)
-        throw std::logic_error("CANNOT DELETE THIS");
+        throw std::logic_error("Cannot remove not existing piece");
 
     if (IsOffboard(index) || IsEmpty(index)) {
         std::cout << CreateFEN() << std::endl;
-        std::cout << "STOP HERE" << std::endl;
         PrintState();
-        assert(false);
-//        throw std::logic_error("Cannot remove piece offboard or empty piece");
+        throw std::logic_error("Cannot remove piece offboard or empty piece");
     }
 
     if (targetColor == EColor::WHITE) {
@@ -452,7 +404,9 @@ bool CBoard::RemovePiece(int index) {
 }
 
 bool CBoard::AddPiece(int index, EPiece piece, EColor color) {
-    assert(m_Board[index]->GetPiece() == EPiece::EMPTY);
+    if (!(m_Board[index]->GetPiece() == EPiece::EMPTY))
+        throw std::runtime_error("Cannot add piece to occupied tile");
+
     std::shared_ptr<CPiece> target;
     if (piece == EPiece::PAWN)
         target = std::make_shared<CPawn>(CPawn(*this, index, color));
@@ -468,11 +422,13 @@ bool CBoard::AddPiece(int index, EPiece piece, EColor color) {
         target = std::make_shared<CKing>(CKing(*this, index, color));
     else
         throw std::logic_error("Cannot add empty or offboard piece");
+
     m_Board[index] = target;
 
     if (++(m_PiecesCount[target->GetCode()]) > 10)
-        throw std::logic_error("CANNOT ADD MORE PIECES");
+        throw std::logic_error("Cannot add more pieces");
 
+    // Hash in the piece
     m_StateKey = m_HashKeys.HashPiece(target->GetCode(), index);
 
     if (color == EColor::WHITE) {
@@ -487,18 +443,23 @@ bool CBoard::AddPiece(int index, EPiece piece, EColor color) {
 }
 
 bool CBoard::MovePiece(int from, int to) {
+
     int pieceToMoveCode = m_Board[from]->GetCode();
+
     if (IsOffboard(from) || IsOffboard(to) || !IsEmpty(to)) {
+        std::cout << CreateFEN();
         PrintState();
-        std::cout << "Cannot move from || to offboard piece" << std::endl;
-        PrintPieceNumTable();
-        assert(false);
+        throw std::runtime_error("Cannot move from or to offboard piece");
     }
 
+    // Hash out the piece
     m_StateKey = m_HashKeys.HashPiece(pieceToMoveCode, from);
+
     m_Board[from]->SetCoord(to);
     m_Board[to] = m_Board[from];
     m_Board[from] = std::make_shared<CEmpty>(CEmpty(*this, from));
+
+    // Hash in the piece
     m_StateKey = m_HashKeys.HashPiece(pieceToMoveCode, to);
     return true;
 }
@@ -511,6 +472,7 @@ bool CBoard::MakeMove(const CMove & move) {
     int from = move.GetFrom();
     int to = move.GetTo();
 
+    // If the king is moved change king position
     if (m_Board[from]->GetPiece() == EPiece::KING) {
         if (move.IsWhiteMove()) {
             m_WhiteKing = to;
@@ -520,6 +482,7 @@ bool CBoard::MakeMove(const CMove & move) {
         }
     }
 
+    // If the move is an en passant capture remove the pawn
     if (move.IsEnPassant()) {
         if (move.IsWhiteMove())
             RemovePiece(to - 10);
@@ -527,6 +490,7 @@ bool CBoard::MakeMove(const CMove & move) {
             RemovePiece(to + 10);
     }
 
+    // If the move is castling move, move rook
     if (move.IsCastling()) {
         switch (to) {
             case C1:
@@ -546,16 +510,21 @@ bool CBoard::MakeMove(const CMove & move) {
 
         }
     }
+
+    // Hash out en passant square
     if (m_EnPassant != EMPTY)
         m_StateKey = m_HashKeys.HashEnPassant(m_EnPassant);
+
+    // Hash out castling permission
     m_StateKey = m_HashKeys.HashCastling(m_Castling);
 
+    // Store board state
     m_History[m_HistoryIndex].m_Move = move;
     m_History[m_HistoryIndex].m_FiftyTurns = m_FiftyTurns;
     m_History[m_HistoryIndex].m_EnPassant = m_EnPassant;
     m_History[m_HistoryIndex].m_Castling = m_Castling;
 
-
+    // Change if castling permissions
     if (from == A1 || to == A1)
         m_Castling &= 0xBU;
     if (from == H1 || to == H1)
@@ -568,32 +537,38 @@ bool CBoard::MakeMove(const CMove & move) {
         m_Castling &= 0x3U;
     if (from == E8 || to == E8)
         m_Castling &= 0xCU;
+
     m_EnPassant = EMPTY;
 
+    // Hash in castling permissions
     m_StateKey = m_HashKeys.HashCastling(m_Castling);
 
+    // If black increment turns;
     if (m_Side == EColor::BLACK) {
         m_Turns++;
         m_FiftyTurns++;
     }
+    // Increment ply after move
     m_Plies++;
     m_HistoryIndex++;
 
+    // If move was a capturing move
     if (move.GetCapture() != EPiece::EMPTY && !move.IsEnPassant()) {
         RemovePiece(to);
         m_FiftyTurns = 0;
     }
 
+    // If moved piece was pawn
     if (m_Board[from]->GetPiece() == EPiece::PAWN) {
         m_FiftyTurns = 0;
         if (move.IsPawnTwoPush()) {
             if (move.IsWhiteMove()) {
                 m_EnPassant = from + 10;
-                assert(GetRank(m_EnPassant) == RANK_3);
+//                assert(GetRank(m_EnPassant) == RANK_3);
             }
             else {
                 m_EnPassant = from - 10;
-                assert(GetRank(m_EnPassant) == RANK_6);
+//                assert(GetRank(m_EnPassant) == RANK_6);
             }
             m_StateKey = m_HashKeys.HashEnPassant(m_EnPassant);
         }
@@ -601,48 +576,55 @@ bool CBoard::MakeMove(const CMove & move) {
 
     MovePiece(from , to);
 
+    // If it is a promotion move
     if (move.GetPromotion() != EPiece::EMPTY) {
         RemovePiece(to);
         AddPiece(to, move.GetPromotion(), move.GetColor());
     }
 
-
-
+    // Used for checking if after the move player is in check (illegal move)
     int king;
     if (m_Side == EColor::WHITE)
         king = m_WhiteKing;
     else
         king = m_BlackKing;
 
+    // Hash in side
     m_Side = OppositeSide(m_Side);
-    m_StateKey = m_HashKeys.HashSide(m_Side);
+    m_StateKey = m_HashKeys.HashSide();
 
+    // Check if the game is a repetition
     if (m_HistoryKeys.find(m_StateKey) != m_HistoryKeys.end()) {
         if (++m_HistoryKeys[m_StateKey] == 3) {
             m_Repetitions = true;
-            std::cout << "\n\nREPETITION\n\n";
         }
     }
     else {
         m_HistoryKeys.emplace(m_StateKey, 1);
     }
 
-
+    // If the move is illegal undo it
     if (TileAttacked(m_Side,king)) {
         UndoMove();
         return false;
     }
+
+    // If the game is in checkmate
+    if (IsInCheck() && GenerateMovesForSide().empty())
+        m_Checkmate = true;
+
     return true;
 }
 
 bool CBoard::UndoMove() {
-
+    // If the game was a threefold repetition
     if (m_HistoryKeys[m_StateKey] == 3) {
         m_Repetitions = false;
     }
 
     m_HistoryKeys[m_StateKey]--;
 
+    // Decrement turns and plies
     if (m_Side == EColor::WHITE) {
         m_Turns--;
         m_FiftyTurns--;
@@ -651,31 +633,41 @@ bool CBoard::UndoMove() {
     m_HistoryIndex--;
 
     CHistory undo = m_History[m_HistoryIndex];
+    // Move to be undone
     CMove undoMove = undo.m_Move;
     int from = undoMove.GetFrom();
     int to = undoMove.GetTo();
 
+    // If en passant square is set hash it out
     if (m_EnPassant != EMPTY)
         m_StateKey = m_HashKeys.HashEnPassant(m_EnPassant);
+
+    // Hash out castling permissions
     m_StateKey = m_HashKeys.HashCastling(m_Castling);
 
     m_Castling = undo.m_Castling;
     m_FiftyTurns = undo.m_FiftyTurns;
     m_EnPassant = undo.m_EnPassant;
 
+    // If en passant square is set hash it in
     if (m_EnPassant != EMPTY)
         m_StateKey = m_HashKeys.HashEnPassant(m_EnPassant);
+
+    // Hash in castling permissions
     m_StateKey = m_HashKeys.HashCastling(m_Castling);
 
     m_Side = OppositeSide(m_Side);
-    m_StateKey = m_HashKeys.HashSide(m_Side);
+    m_StateKey = m_HashKeys.HashSide();
 
+    // If the undo move is an en passant capture add the pawn back
     if (undoMove.IsEnPassant()) {
         if (undoMove.IsWhiteMove())
             AddPiece(to - 10, EPiece::PAWN, EColor::BLACK);
         else
             AddPiece(to + 10, EPiece::PAWN, EColor::WHITE);
     }
+
+    // If the move is an castling move, move back the rook
     if (undoMove.IsCastling()) {
         switch (to) {
             case C1:
@@ -698,6 +690,7 @@ bool CBoard::UndoMove() {
 
     MovePiece(to, from);
 
+    // If king was moved change king position
     if (m_Board[from]->GetPiece() == EPiece::KING) {
         if (undoMove.IsWhiteMove()) {
             m_WhiteKing = from;
@@ -707,85 +700,80 @@ bool CBoard::UndoMove() {
         }
     }
 
+    // If the move was a capture, add the captured piece back
     if (undoMove.GetCapture() != EPiece::EMPTY && !undoMove.IsEnPassant()) {
         AddPiece(to, undoMove.GetCapture(), OppositeSide(m_Side));
     }
 
+    // If the move was a promotion, remove promoted piece and add a pawn
     if (undoMove.GetPromotion() != EPiece::EMPTY) {
         RemovePiece(from);
         AddPiece(from, EPiece::PAWN, m_Side);
     }
 
-    if (IsInCheck() && GenerateMovesForSide().empty())
-        m_Checkmate = true;
-
     return true;
 }
 
 std::list<CMove> CBoard::GenerateMovesForSide() {
+    // Go through all pieces and generate its moves
     std::list<CMove> moveList;
     if (m_Side == EColor::WHITE)
         for (const auto & i : m_WhitePieces)
-            moveList.splice(moveList.end(), std::move(i->MoveList()));
+            moveList.splice(moveList.end(), i->MoveList());
     else
         for (const auto & i : m_BlackPieces)
-            moveList.splice(moveList.end(), std::move(i->MoveList()));
+            moveList.splice(moveList.end(), i->MoveList());
 
     return moveList;
 }
 
 
 std::list<CMove> CBoard::GenerateCaptureMovesForSide() {
+    // Go through all pieces and generate all its capturing moves
     std::list<CMove> moveList;
     if (m_Side == EColor::WHITE)
         for (const auto & i : m_WhitePieces)
-            moveList.splice(moveList.end(), std::move(i->CaptureMoveList()));
+            moveList.splice(moveList.end(), i->CaptureMoveList());
     else
         for (const auto & i : m_BlackPieces)
-            moveList.splice(moveList.end(), std::move(i->CaptureMoveList()));
+            moveList.splice(moveList.end(), i->CaptureMoveList());
 
     return moveList;
 }
 
 void CBoard::Perft(int depth, uint64_t & leafNodes) {
-    std::ostringstream os;
-    std::list<CMove> moveList = std::move(GenerateMovesForSide());
-    if (!depth) {
-        leafNodes++;
-        return;
-    }
-
-    for (const auto & i : moveList) {
-        Perft(depth - 1, leafNodes);
-        UndoMove();
-    }
-    return;
-}
-
-void CBoard::PerftRootTest(int depth, uint64_t & leafNodes) {
-    std::list<CMove> moveList = std::move(GenerateMovesForSide());
-
-    for (const auto & i : moveList) {
-        if (!MakeMove(i)) {
-//            CheckCount++;
-            continue;
+        std::ostringstream os;
+        std::list<CMove> moveList = std::move(GenerateMovesForSide());
+        if (!depth) {
+            leafNodes++;
+            return;
         }
 
+        for (const auto & i : moveList) {
+//        std::cout << "//////////////////////////////////////////" << std::endl;
+//        std::cout << "BEFORE: " << i << std::endl;
+//        PrintState();
+//        std::cout << std::endl;
 
-        uint64_t currentLeafNodes = leafNodes;
-        Perft(depth - 1, leafNodes);
-        UndoMove();
-        uint64_t moveLeafNodes = leafNodes - currentLeafNodes;
-        std::cout << "move: " << i << " ,leaf nodes for this move " << moveLeafNodes << std::endl;
-    }
-    return;
+            if (!MakeMove(i)) {
+//            std::cout << "ILLEGAL MOVE" << std::endl;
+//            std::cout << "//////////////////////////////////////////" << std::endl;
+                continue;
+            }
+
+//        std::cout << "depth: " << depth << ",move: " << i << " --------------------------" << std::endl;
+//        PrintState();
+//        std::cout << "//////////////////////////////////////////" << std::endl << std::endl << std::endl;
+            Perft(depth - 1, leafNodes);
+            UndoMove();
+        }
+        return;
 }
 
-void CBoard::PerftTest(int depth) {
+uint64_t CBoard::PerftTest(int depth) {
     uint64_t leafNodes = 0;
     Perft(depth, leafNodes);
-    std::cout << "Total leaf nodes: " << leafNodes << std::endl;
-
+    return leafNodes;
 }
 
 void CBoard::PrintPieceNumTable() const {
@@ -821,6 +809,7 @@ void CBoard::InitialScore() {
 }
 
 bool CBoard::IsDraw() {
+    // source: https://en.wikipedia.org/wiki/Draw_(chess)
     int totalPieces = m_WhitePieces.size() + m_BlackPieces.size();
     int whiteBishops = 0;
     int blackBishops = 0;
@@ -895,6 +884,8 @@ std::ostream & operator<<(std::ostream & os, const CBoard & board) {
             case EPiece::QUEEN:
                 queens++;
                 break;
+            default:
+                break;
         }
     }
     os << pawns << ' ' << knights << ' ' << bishops << ' ' << rooks << ' ' << queens << ' ' << board.m_WhitePieces.size() << std::endl;
@@ -922,6 +913,8 @@ std::ostream & operator<<(std::ostream & os, const CBoard & board) {
             case EPiece::QUEEN:
                 queens++;
                 break;
+            default:
+                break;
         }
     }
 
@@ -939,7 +932,9 @@ std::ostream & operator<<(std::ostream & os, const CBoard & board) {
         sum += i.first + i.second;
         os << i.first << ":" << i.second << std::endl;
     }
-    os << key << ' ' << sum << std::endl;
+
+    // key for checking when loadidng
+    os << key << ':' << sum << std::endl;
     return os;
 }
 
@@ -949,23 +944,22 @@ std::istream & operator>>(std::istream & is, CBoard & board) {
     if (is.fail())
         return is;
 
+
     if (!board.ReadFEN(line) || board.CreateFEN() != line) {
         is.setstate(std::ios::failbit);
         return is;
     }
-
     getline(is, line);
     if (is.fail())
         return is;
-
     int pawns = 0;
     int knights = 0;
     int bishops = 0;
     int rooks = 0;
     int queens = 0;
-    int total = 0;
+    size_t total = 0;
 
-    if (sscanf(line.c_str(),"%d %d %d %d %d %d", &pawns, &knights, &bishops, &rooks, &queens, &total) != 6 ||
+    if (sscanf(line.c_str(),"%d %d %d %d %d %lu", &pawns, &knights, &bishops, &rooks, &queens, &total) != 6 ||
         pawns != board.m_PiecesCount[P] ||
         knights != board.m_PiecesCount[N] ||
         bishops != board.m_PiecesCount[B] ||
@@ -975,7 +969,6 @@ std::istream & operator>>(std::istream & is, CBoard & board) {
         is.setstate(std::ios::failbit);
         return is;
     }
-
     getline(is, line);
     if (is.fail())
         return is;
@@ -986,8 +979,7 @@ std::istream & operator>>(std::istream & is, CBoard & board) {
     rooks = 0;
     queens = 0;
     total = 0;
-
-    if (sscanf(line.c_str(),"%d %d %d %d %d %d", &pawns, &knights, &bishops, &rooks, &queens, &total) != 6 ||
+    if (sscanf(line.c_str(),"%d %d %d %d %d %lu", &pawns, &knights, &bishops, &rooks, &queens, &total) != 6 ||
         pawns != board.m_PiecesCount[p] ||
         knights != board.m_PiecesCount[n] ||
         bishops != board.m_PiecesCount[b] ||
@@ -997,20 +989,19 @@ std::istream & operator>>(std::istream & is, CBoard & board) {
         is.setstate(std::ios::failbit);
         return is;
     }
-
     if (!(is >> board.m_HashKeys))
         return is;
-
     if (!(is >> board.m_StateKey))
         return is;
-
     if (board.m_StateKey != board.m_HashKeys.GetStateKey()) {
+        std::cout << board.m_StateKey << std::endl;
+        std::cout << board.m_HashKeys.GetStateKey() << std::endl;
+
         is.setstate(std::ios::failbit);
         return is;
     }
 
     uint64_t cnt;
-
     if (!(is >> cnt))
         return is;
 
@@ -1041,7 +1032,8 @@ std::istream & operator>>(std::istream & is, CBoard & board) {
     if (!(is >> checkKey >> c >> checkSum))
         return is;
 
-    if (key != checkKey || c != ' ' || sum != checkSum) {
+    // check if the keys match
+    if (key != checkKey || c != ':' || sum != checkSum) {
         is.setstate(std::ios::failbit);
         return is;
     }
@@ -1050,7 +1042,6 @@ std::istream & operator>>(std::istream & is, CBoard & board) {
 }
 
 void CBoard::Restart() {
-    if(!ReadFEN(START_FEN))
-        std::cout << "CHYBA" << std::endl;
-
+    if (!ReadFEN(START_FEN))
+        throw std::runtime_error("Error during restarting game.");
 }

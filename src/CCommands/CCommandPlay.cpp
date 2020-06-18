@@ -31,7 +31,7 @@ bool CCommandPlay::Execute() {
 
     if (sscanf(input.c_str()," %c%c%c", &white, &black, &difficulty) != 3) {
         std::cout << input << std::endl;
-        m_Interface.PromptMessage("Invalid format, for help enter the command 'help'\n");
+        m_Interface.PromptMessage("Invalid format\n");
         return true;
     }
 
@@ -43,7 +43,7 @@ bool CCommandPlay::Execute() {
     else if (white == 'p' && black == 'c' && '0' < difficulty && difficulty < '6')
         return m_Game.InitializePlayerVsComputer(EColor::BLACK, difficulty - '0');
     else {
-        m_Interface.PromptMessage("Invalid format, for help enter the command 'help'\n");
+        m_Interface.PromptMessage("Invalid format\n");
         return true;
     }
 }

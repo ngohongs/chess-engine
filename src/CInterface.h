@@ -12,23 +12,48 @@
 #include <functional>
 #include "CMove.h"
 
+
+/**
+ * Class CInterface for CApplication to interact with the user
+ */
 class CInterface {
 private:
     std::ostream & m_Out;
+
     std::istream & m_In;
 public:
     explicit CInterface(std::ostream &out, std::istream &in);
 
+    /**
+     * Outputs message to m_Out
+     * @param message
+     */
     void PromptMessage(const char * message);
+
+    /**
+     * Outputs message to m_Out
+     * @param message
+     */
     void PromptMessage(const std::string & message);
 
-    std::ostream & GetOstream() const;
-    std::istream & GetIstream() const;
+    std::ostream & GetOstream() const {
+        return m_Out;
+    }
+    std::istream & GetIstream() const {
+        return m_In;
+    }
 
+    /**
+     * Prompts the user for command
+     * @param valid function for validation of the command
+     * @return command in std::string format, if input reached EOF "quit"
+     */
     std::string PromptCommand(const std::function<bool (const std::string &)> &valid);
 
-    CMove PromptMove();
 
+    /**
+     * Clears the m_In for reusing
+     */
     void Clear();
 };
 

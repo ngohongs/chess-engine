@@ -23,6 +23,8 @@ std::list<CMove> CQueen::MoveList() const {
     EPiece piece;
     EColor color;
 
+    // King moves has the same directions as queen, but queen can move until a capture or border
+    // For each direction go until a capture or border
     for (int i : KING_ATTACKS) {
         tempTile = m_Coord + i;
         while (!m_Board.IsOffboard(tempTile)) {
@@ -42,7 +44,7 @@ std::list<CMove> CQueen::MoveList() const {
     }
     return moveList;
 }
-
+// Same as MoveList only for captures
 std::list<CMove> CQueen::CaptureMoveList() const {
     std::list<CMove> moveList;
     int tempTile;

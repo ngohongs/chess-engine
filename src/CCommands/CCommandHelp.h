@@ -17,5 +17,9 @@ private:
 public:
     explicit CCommandHelp(const CInterface & interface, const char * help, std::map<std::string, std::unique_ptr<CCommand>> & commands);
 
+    /**
+     * Shows help for program
+     * @return true
+     */
     bool Execute() override;
 };

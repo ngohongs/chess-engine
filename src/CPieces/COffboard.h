@@ -15,11 +15,11 @@ class COffboard : public CPiece {
 public:
     COffboard(CBoard & board, int coord);
 
-    std::ostream & Print(std::ostream & os) const;
+    std::ostream & Print(std::ostream & os) const override;
 
-    std::list<CMove> MoveList() const;
+    std::list<CMove> MoveList() const override;
 
-    std::list<CMove> CaptureMoveList() const;
+    std::list<CMove> CaptureMoveList() const override;
 };
 
 

@@ -12,6 +12,10 @@ class CCommandQuit : public CCommand {
 public:
     CCommandQuit(const CInterface & interface, const char * help);
 
+    /**
+     * Quits the program
+     * @return false
+     */
     bool Execute() override;
 };
 

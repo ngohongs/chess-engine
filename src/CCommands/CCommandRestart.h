@@ -14,6 +14,10 @@ private:
 public:
     CCommandRestart(const CInterface & interface, const char * help, CGame & game);
 
+    /**
+     * Restarts the game
+     * @return true
+     */
     bool Execute() override;
 
 };

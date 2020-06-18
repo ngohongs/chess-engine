@@ -12,6 +12,7 @@ CCommandRestart::CCommandRestart(const CInterface & interface, const char * help
 
 bool CCommandRestart::Execute() {
     std::string line;
+    // If game is not initialized yet
     if (!m_Game.IsInitialized()) {
         m_Interface.PromptMessage("Game is not initialzed yet, for help enter the command 'help'\n");
         return true;
