@@ -31,11 +31,11 @@ Kde lze využít polymorfismus? (doporučené)
 
 Šachy budou mít konzolové uživatelské rozhraní. Po spuštění se hra bude ovládat těmito příkazy.
 
-- `play [p|c][p|c][1|2|3|4|5]` vytvoří hru, první pozice je bílý hráč, druhý černý. `p` znamená hráč, `c` je počítač. Při hře proti počítači je nutno dopsat obtižnost od 1-5.                
+- `play [p|c][p|c][1|2|3|4|5]` vytvoří hru, první pozice je bílý hráč, druhý černý. `p` znamená hráč, `c` je počítač. Při hře proti počítači je nutno dopsat obtižnost od 1-5 (př. `play pc4`) (vše malými písmeny).                
 - `save [filename]` uloží rozehranou hru do souboru (`filename`)
 - `load [filnename]` načte uloženou hru ze souboru (`filename`)
 - `board` zobrazí stav herní desky
-- `move [source_x][source_y][target_x][target_y][q|r|b|n]` přesune figurku z pozice (`source_x`,`source_y`) na pozici (`target_x`,`target_y`), jestli se jedná o proměnu pěšce, musí být dodána figurka, v kterou se pěšec promění.
+- `move [a|b|c|d|e|f|g|h][1|2|3|4|5|6|7|8][a|b|c|d|e|f|g|h][1|2|3|4|5|6|7|8][q|r|b|n]` přesune figurku z pozice (první dvě písmena, př. `a1`) na pozici (první dvě písmena, př. `b1`), jestli se jedná o proměnu pěšce, musí být dodána figurka, v kterou se pěšec promění (vše malými písmeny) (př. `move e2e4`).
 - `restart` resetuje hru
 - `help` zobrazí nápovědu
 - `quit` ukončí program
