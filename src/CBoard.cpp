@@ -229,8 +229,10 @@ bool CBoard::ReadFEN(const std::string & fen) {
     else if ((m_EnPassant = TileToIndex(enPassant)) == OFFBOARD)
         return false;
 
-    if (ply >= 0)
+    if (ply >= 0) {
         m_FiftyTurns = ply / 2;
+        m_Plies = ply;
+    }
     else
         return false;
     if (turn >= 1)
@@ -239,8 +241,10 @@ bool CBoard::ReadFEN(const std::string & fen) {
         return false;
 
     // Check for the order of castling permissions
-    if (fen != CreateFEN())
+    if (fen != CreateFEN()) {
+        std::cout << fen << " vs. " << CreateFEN() << std::endl;
         return false;
+    }
 
     m_StateKey = m_HashKeys.GenerateStateKey(m_Board, m_Side, m_Castling, m_EnPassant);
     m_HistoryKeys[m_StateKey] = 1;
@@ -743,7 +747,7 @@ std::list<CMove> CBoard::GenerateCaptureMovesForSide() {
 
 void CBoard::Perft(int depth, uint64_t & leafNodes) {
         std::ostringstream os;
-        std::list<CMove> moveList = std::move(GenerateMovesForSide());
+        std::list<CMove> moveList = GenerateMovesForSide();
         if (!depth) {
             leafNodes++;
             return;

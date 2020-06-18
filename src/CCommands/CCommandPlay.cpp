@@ -13,7 +13,7 @@ bool CCommandPlay::Execute() {
     std::string bin;
     if (m_Game.IsInitialized()) {
         m_Interface.GetIstream() >> bin;
-        m_Interface.PromptMessage("Game is already initialzed.\n");
+        m_Interface.PromptMessage("Game is already initialized.\n");
         return true;
     }
     std::string input;
@@ -21,8 +21,10 @@ bool CCommandPlay::Execute() {
     char black;
     char difficulty;
 
+    m_Game.Restart();
+
     m_Interface.GetIstream() >> input;
-    input.push_back('0');
+    input.push_back(' ');
 
     if (m_Interface.GetIstream().eof())
         return false;
@@ -35,8 +37,7 @@ bool CCommandPlay::Execute() {
         return true;
     }
 
-
-    if (white == 'p' && black == 'p' && difficulty == '0')
+    if (white == 'p' && black == 'p' && difficulty == ' ')
         return m_Game.InitializePlayerVsPlayer();
     else if (white == 'c' && black == 'p' && '0' < difficulty && difficulty < '6')
         return m_Game.InitializePlayerVsComputer(EColor::WHITE, difficulty - '0');

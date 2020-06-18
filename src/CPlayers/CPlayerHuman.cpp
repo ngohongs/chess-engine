@@ -54,7 +54,7 @@ bool CPlayerHuman::TakeTurn() {
             return true;
         }
     }
-    m_Interface.PromptMessage("Invalid move, for help enter the command 'help'\n");
+    m_Interface.PromptMessage("Invalid move.\n");
     m_Interface.Clear();
     return true;
 

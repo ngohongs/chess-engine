@@ -102,8 +102,10 @@ std::ostream & operator<<(std::ostream & os, const CGame & self) {
 
 std::istream & operator>>(std::istream & is, CGame & self) {
 
-    if (!(is >> self.m_Board))
+    if (!(is >> self.m_Board)) {
+        self.m_Initialized = false;
         return is;
+    }
 
     int difficulty;
     int key = 0;
@@ -112,16 +114,20 @@ std::istream & operator>>(std::istream & is, CGame & self) {
     char playerTwo;
     char c;
 
-    if (!(is >> playerOne >> playerTwo >> difficulty >> c >> checkKey))
+    if (!(is >> playerOne >> playerTwo >> difficulty >> c >> checkKey)) {
+        self.m_Initialized = false;
         return is;
+    }
 
     if (c != ':') {
         is.setstate(std::ios::failbit);
+        self.m_Initialized = false;
         return is;
     }
 
     if (0 >= difficulty || difficulty >= 6) {
         is.setstate(std::ios::failbit);
+        self.m_Initialized = false;
         return is;
     }
 
@@ -129,11 +135,13 @@ std::istream & operator>>(std::istream & is, CGame & self) {
 
     if (playerOne == 'c' && playerTwo == 'c') {
         is.setstate(std::ios::failbit);
+        self.m_Initialized = false;
         return is;
     }
 
     if (playerOne == 'p' && playerTwo == 'p' && difficulty != 1) {
         is.setstate(std::ios::failbit);
+        self.m_Initialized = false;
         return is;
     }
 
@@ -144,6 +152,7 @@ std::istream & operator>>(std::istream & is, CGame & self) {
         key |= 2;
     }
     else {
+        self.m_Initialized = false;
         is.setstate(std::ios::failbit);
         return is;
     }
@@ -154,12 +163,14 @@ std::istream & operator>>(std::istream & is, CGame & self) {
         key |= 1;
     }
     else {
+        self.m_Initialized = false;
         is.setstate(std::ios::failbit);
         return is;
     }
 
     // if keys do not match
     if (key != checkKey) {
+        self.m_Initialized = false;
         is.setstate(std::ios::failbit);
         return is;
     }
@@ -169,6 +180,10 @@ std::istream & operator>>(std::istream & is, CGame & self) {
 }
 
 void CGame::Restart() {
+    m_White = nullptr;
+    m_Black = nullptr;
+    m_Initialized = false;
+    m_End = false;
     m_Board.Restart();
 }
 

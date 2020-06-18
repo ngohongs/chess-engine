@@ -59,6 +59,9 @@ public:
      */
     void Restart();
 
+    void SetInitialized(bool init) {
+        m_Initialized = init;
+    }
     const CBoard & GetBoard() const {
         return m_Board;
     }

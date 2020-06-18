@@ -37,11 +37,13 @@ bool CCommandLoad::Execute() {
 
     if (file.fail()) {
         m_Interface.PromptMessage("Error during opening save file.\n");
+        m_Game.SetInitialized(false);
         return true;
     }
 
     if (!(file >> m_Game)) {
         m_Interface.PromptMessage("Save file is corrupted.\n");
+        m_Game.SetInitialized(false);
         return true;
     }
 

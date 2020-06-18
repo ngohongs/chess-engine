@@ -1,10 +1,11 @@
 TARGET = ngohongs
-
+TEST_TARGET = test_ngohongs
 
 
 BUILD_DIR = build
 SOURCE_DIR = src
 DOC_DIR = doc
+TEST_DIR = test
 
 CXX = g++
 CXX_FLAGS = -Wall -pedantic -Wextra -std=c++14
@@ -13,24 +14,33 @@ CXX_FLAGS = -Wall -pedantic -Wextra -std=c++14
 all: compile
 
 .PHONY: compile
-compile: $(TARGET)
+compile: $(TARGET) $(TEST_DIR)/$(TEST_TARGET)
 
 .PHONY: run
 run:
-	$(TARGET)
-	./$(TARGET)
+								$(TARGET)
+								./$(TARGET)
 
 .PHONY: clean
 clean:
-	rm -rf $(TARGET) $(DOC_DIR) $(BUILD_DIR)/ 2>/dev/null
+								rm -rf $(TARGET) $(DOC_DIR) $(TEST_DIR)/$(TEST_TARGET)  $(BUILD_DIR)/ 2>/dev/null
 
-doc: // TODO header files
-	doxygen Doxyfile
+
+.PHONY: test
+								$(TEST_DIR)/$(TEST_TARGET)
+								./$(TEST_DIR)/$(TEST_TARGET)
+
+doc: 							src/ README.md
+								doxygen Doxyfile
 
 
 $(BUILD_DIR)/%.o:               src/%.cpp
 							    mkdir -p $(BUILD_DIR)
 							    $(CXX) $(CXX_FLAGS) $< -c -o $@
+
+$(BUILD_DIR)/%.o:               test/%.cpp
+								mkdir -p $(BUILD_DIR)
+								$(CXX) $(CXX_FLAGS) $< -c -o $@
 
 $(BUILD_DIR)/%.o:               src/*/%.cpp
 								mkdir -p $(BUILD_DIR)
@@ -48,6 +58,17 @@ $(TARGET):                      $(BUILD_DIR)/main.o $(BUILD_DIR)/ETile.o $(BUILD
 							    $(BUILD_DIR)/CPlayerHuman.o
 							    mkdir -p $(BUILD_DIR)
 							    $(CXX) $(CXX_FLAGS) $^ -o $@
+
+$(TEST_DIR)/$(TEST_TARGET):		$(BUILD_DIR)/unittestCBoard.o \
+								$(BUILD_DIR)/ETile.o $(BUILD_DIR)/EPiece.o $(BUILD_DIR)/EColor.o \
+							    $(BUILD_DIR)/CPiece.o $(BUILD_DIR)/CMove.o \
+							    $(BUILD_DIR)/CHistory.o $(BUILD_DIR)/CHashKey.o \
+							    $(BUILD_DIR)/CBoard.o \
+							    $(BUILD_DIR)/CBishop.o \
+							    $(BUILD_DIR)/CEmpty.o $(BUILD_DIR)/CKing.o $(BUILD_DIR)/CKnight.o $(BUILD_DIR)/COffboard.o \
+							    $(BUILD_DIR)/CPawn.o $(BUILD_DIR)/CQueen.o $(BUILD_DIR)/CRook.o
+							    mkdir -p $(BUILD_DIR)
+								$(CXX) $(CXX_FLAGS) $^ -o $@
 
 $(BUILD_DIR)/CApplication.o:    src/CApplication.cpp src/CApplication.h src/CInterface.h \
                                 src/CMove.h src/EPiece.h src/EColor.h src/ETile.h src/EConst.h \
@@ -278,4 +299,11 @@ $(BUILD_DIR)/main.o:            src/main.cpp src/CApplication.h src/CInterface.h
                                 src/CCommands/CCommandBoard.h src/CCommands/CCommandMove.h \
                                 src/CCommands/CCommandPlay.h src/CCommands/CCommandSave.h \
                                 src/CCommands/CCommandLoad.h src/CCommands/CCommandRestart.h
-
+$(BUILD_DIR)/unittestCBoard.o:  test/unittestCBoard.cpp test/../src/CBoard.h \
+								test/../src/CPiece.h test/../src/CMove.h test/../src/EPiece.h \
+								test/../src/EColor.h test/../src/ETile.h test/../src/EConst.h \
+								test/../src/CPieces/CKing.h test/../src/CPieces/CQueen.h \
+								test/../src/CPieces/CBishop.h test/../src/CPieces/CKnight.h \
+								test/../src/CPieces/CRook.h test/../src/CPieces/CPawn.h \
+								test/../src/CPieces/CEmpty.h test/../src/CPieces/COffboard.h \
+								test/../src/CHashKey.h test/../src/CHistory.h test/../src/FENTest.h
