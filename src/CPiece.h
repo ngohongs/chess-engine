@@ -37,7 +37,6 @@ protected:
     // Piece code
     int m_PieceCode;
 
-    // TODO remove m_Lasturn
     size_t m_LastTurn = 0;
 public:
     explicit CPiece(CBoard & board, int coord, EPiece piece, EColor color, int code);
