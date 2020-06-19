@@ -6,7 +6,6 @@
 #pragma once
 
 #include <iostream>
-#include <cassert>
 #include <string>
 #include <cstring>
 #include <list>
@@ -14,11 +13,8 @@
 #include <climits>
 #include <iomanip>
 #include <vector>
-#include <chrono>
 #include <memory>
 #include <sstream>
-#include <random>
-#include <cinttypes>
 #include <climits>
 #include <fstream>
 #include "CPiece.h"

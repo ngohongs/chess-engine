@@ -21,6 +21,16 @@ bool CPlayerHuman::TakeTurn() {
     if (m_Interface.GetIstream().eof())
         return false;
 
+    std::string line;
+    getline(m_Interface.GetIstream(), line);
+    if (m_Interface.GetIstream().fail())
+        throw std::runtime_error("Error during reading input (move).");
+
+    if (line != "") {
+        m_Interface.PromptMessage("Command 'move' has no options apart from origin and destination for a move, occasionally a piece for a pawn to promote to.\n");
+        return true;
+    }
+
     if (m_Interface.GetIstream().fail()) {
         m_Interface.PromptMessage("Invalid move.\n");
         m_Interface.Clear();
