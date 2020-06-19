@@ -3,6 +3,7 @@
  * @date 18/06/2020.
  */
 
+#include <cassert>
 #include "../src/CBoard.h"
 #include "../src/FENTest.h"
 
