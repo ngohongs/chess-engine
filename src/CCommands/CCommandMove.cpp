@@ -42,7 +42,7 @@ bool CCommandMove::Execute() {
         m_Interface.PromptMessage("Game is over. Do you want to restart the game [y/N]: ");
         getline(m_Interface.GetIstream(), line);
         if (m_Interface.GetIstream().fail())
-            throw std::runtime_error("Error during reading input (loading).");
+            throw std::runtime_error("Error during reading input (move).");
 
         for (auto & i : line)
             i = std::tolower(i);
