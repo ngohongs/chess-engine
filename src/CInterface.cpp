@@ -22,8 +22,7 @@ std::string CInterface::PromptCommand(const std::function<bool (const std::strin
         else if (m_In.fail())
             throw std::runtime_error("Error during inputting command");
         else if (!valid(command)) {
-            getline(m_In, command);
-            std::cout << "Non-existing command, Enter a valid command, for help enter the command 'help'." << std::endl;
+            std::cout << "Non-existing command, Enter a valid command, for help enter the command 'help':" << std::endl;
             Clear();
             }
         else

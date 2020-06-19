@@ -35,9 +35,13 @@ bool CBoard::ReadFEN(const std::string & fen) {
     m_WhitePieces = {};
     m_BlackPieces = {};
     m_Plies = 0;
-    m_Plies = 0;
     m_Turns = 1;
     m_FiftyTurns = 0;
+    m_WhiteKing = E1;
+    m_BlackKing = E8;
+    m_Side = EColor::WHITE;
+    m_EnPassant = EMPTY;
+    m_Castling = 0xF;
 
 
     for (int i = 0; i < 120; i++)
@@ -241,10 +245,8 @@ bool CBoard::ReadFEN(const std::string & fen) {
         return false;
 
     // Check for the order of castling permissions
-    if (fen != CreateFEN()) {
-        std::cout << fen << " vs. " << CreateFEN() << std::endl;
+    if (fen != CreateFEN())
         return false;
-    }
 
     m_StateKey = m_HashKeys.GenerateStateKey(m_Board, m_Side, m_Castling, m_EnPassant);
     m_HistoryKeys[m_StateKey] = 1;
@@ -387,11 +389,8 @@ bool CBoard::RemovePiece(int index) {
     if (--(m_PiecesCount[targetCode]) < 0)
         throw std::logic_error("Cannot remove not existing piece");
 
-    if (IsOffboard(index) || IsEmpty(index)) {
-        std::cout << CreateFEN() << std::endl;
-        PrintState();
-        throw std::logic_error("Cannot remove piece offboard or empty piece");
-    }
+    if (IsOffboard(index) || IsEmpty(index))
+        throw std::logic_error("Cannot remove piece off board or empty piece");
 
     if (targetColor == EColor::WHITE) {
         m_WhitePieces.remove(m_Board[index]);
@@ -450,11 +449,8 @@ bool CBoard::MovePiece(int from, int to) {
 
     int pieceToMoveCode = m_Board[from]->GetCode();
 
-    if (IsOffboard(from) || IsOffboard(to) || !IsEmpty(to)) {
-        std::cout << CreateFEN();
-        PrintState();
+    if (IsOffboard(from) || IsOffboard(to) || !IsEmpty(to))
         throw std::runtime_error("Cannot move from or to offboard piece");
-    }
 
     // Hash out the piece
     m_StateKey = m_HashKeys.HashPiece(pieceToMoveCode, from);
@@ -864,7 +860,12 @@ bool CBoard::NoPossibleMoves() {
 }
 
 std::ostream & operator<<(std::ostream & os, const CBoard & board) {
-    os << board.CreateFEN() << std::endl;
+    std::string fen = board.CreateFEN();
+    int fenKey = 0;
+    for (const auto & i : fen)
+        fenKey += i;
+    os << fen << std::endl;
+    os << fenKey << std::endl;
     int pawns = 0;
     int knights = 0;
     int bishops = 0;
@@ -949,13 +950,24 @@ std::istream & operator>>(std::istream & is, CBoard & board) {
         return is;
 
 
-    if (!board.ReadFEN(line) || board.CreateFEN() != line) {
+    if (!board.ReadFEN(line)) {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+    int fenKey;
+    int checkFenKey = 0;
+    for (const auto & i : line)
+        checkFenKey += i;
+
+    if (!(is >> fenKey) || fenKey != checkFenKey) {
         is.setstate(std::ios::failbit);
         return is;
     }
     getline(is, line);
+    getline(is, line);
     if (is.fail())
         return is;
+
     int pawns = 0;
     int knights = 0;
     int bishops = 0;
@@ -998,9 +1010,6 @@ std::istream & operator>>(std::istream & is, CBoard & board) {
     if (!(is >> board.m_StateKey))
         return is;
     if (board.m_StateKey != board.m_HashKeys.GetStateKey()) {
-        std::cout << board.m_StateKey << std::endl;
-        std::cout << board.m_HashKeys.GetStateKey() << std::endl;
-
         is.setstate(std::ios::failbit);
         return is;
     }

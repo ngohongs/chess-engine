@@ -17,8 +17,7 @@ all: compile
 compile: $(TARGET) $(TEST_DIR)/$(TEST_TARGET)
 
 .PHONY: run
-run:
-								$(TARGET)
+run:							$(TARGET)
 								./$(TARGET)
 
 .PHONY: clean
@@ -27,10 +26,14 @@ clean:
 
 
 .PHONY: test
+test:
 								$(TEST_DIR)/$(TEST_TARGET)
 								./$(TEST_DIR)/$(TEST_TARGET)
 
-doc: 							src/ README.md
+.PHONY: doc
+doc: 						src/ README.md
+								mkdir -p $(DOC_DIR)
+								cd $(DOC_DIR)
 								doxygen Doxyfile
 
 
