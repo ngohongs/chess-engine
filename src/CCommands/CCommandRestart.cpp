@@ -24,7 +24,6 @@ bool CCommandRestart::Execute() {
 
     // If game is not initialized yet
     if (!m_Game.IsInitialized()) {
-        getline(m_Interface.GetIstream(), line);
         m_Interface.PromptMessage("Game is not initialized yet, for help enter the command 'help'\n");
         return true;
     }
