@@ -40,7 +40,6 @@ bool CCommandMove::Execute() {
 
     if (!m_Game.MakeTurn()) {
         m_Interface.PromptMessage("Game is over. Do you want to restart the game [y/N]: ");
-        getline(m_Interface.GetIstream(), bin);
         getline(m_Interface.GetIstream(), line);
         if (m_Interface.GetIstream().fail())
             throw std::runtime_error("Error during reading input (loading).");
