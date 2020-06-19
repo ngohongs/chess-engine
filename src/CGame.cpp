@@ -67,9 +67,9 @@ bool CGame::InitializePlayerVsComputer(EColor computerSide, int difficulty) {
 
 std::ostream & CGame::Print(std::ostream & os) {
     if (m_Board.GetSide() == EColor::WHITE)
-        m_Interface.PromptMessage("Side to turn: WHITE\n");
+        m_Interface.PromptMessage("Side to move: WHITE\n");
     else
-        m_Interface.PromptMessage("Side to turn: BLACK\n");
+        m_Interface.PromptMessage("Side to move: BLACK\n");
     m_Board.Print(m_Interface.GetOstream());
     return os;
 }
