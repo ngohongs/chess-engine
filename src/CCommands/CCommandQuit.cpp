@@ -20,6 +20,19 @@ bool CCommandQuit::Execute() {
         m_Interface.PromptMessage("Command 'quit' has no options.\n");
         return true;
     }
-    return false;
+
+    m_Interface.PromptMessage("Do you want to quit the game without saving? [y/N]: ");
+    getline(m_Interface.GetIstream(), line);
+    if (m_Interface.GetIstream().fail())
+        throw std::runtime_error("Error during reading input (quit).");
+
+    for (auto & i : line)
+        i = std::tolower(i);
+
+    if (line == "y" || line == "yes") {
+        return false;
+    }
+
+    return true;
 }
 

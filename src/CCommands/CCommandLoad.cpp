@@ -34,7 +34,6 @@ bool CCommandLoad::Execute() {
             i = std::tolower(i);
 
         if (line != "y" && line != "yes") {
-            m_Interface.PromptMessage("\n");
             return true;
         }
     }
@@ -44,7 +43,7 @@ bool CCommandLoad::Execute() {
     file.open(path, std::ios::in | std::ios::binary);
 
     if (file.fail()) {
-        m_Interface.PromptMessage("Error during opening save file.\n");
+        m_Interface.PromptMessage("Error during opening save file or it does not exist.\n");
         m_Game.SetInitialized(false);
         return true;
     }

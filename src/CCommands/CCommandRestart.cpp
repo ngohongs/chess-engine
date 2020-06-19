@@ -41,7 +41,6 @@ bool CCommandRestart::Execute() {
         return true;
     }
     else {
-        m_Interface.PromptMessage("\n");
         return true;
     }
 }
