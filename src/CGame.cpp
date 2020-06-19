@@ -101,7 +101,7 @@ std::ostream & operator<<(std::ostream & os, const CGame & self) {
 }
 
 std::istream & operator>>(std::istream & is, CGame & self) {
-
+    self.Restart();
     if (!(is >> self.m_Board)) {
         self.m_Initialized = false;
         return is;
