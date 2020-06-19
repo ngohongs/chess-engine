@@ -66,7 +66,6 @@ bool CPlayerHuman::TakeTurn() {
         }
     }
     m_Interface.PromptMessage("Invalid move.\n");
-    m_Interface.Clear();
     return true;
 
 }
