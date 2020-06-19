@@ -13,9 +13,8 @@ bool CCommandMove::Execute() {
     std::string bin;
     std::string line;
     if (m_Game.IsOver()) {
-        m_Interface.GetIstream() >> bin;
+        getline(m_Interface.GetIstream(), bin);
         m_Interface.PromptMessage("Game is over. Do you want to restart the game [y/N]: ");
-        getline(m_Interface.GetIstream(), line);
         getline(m_Interface.GetIstream(), line);
         if (m_Interface.GetIstream().fail())
             throw std::runtime_error("Error during reading input (move).");
@@ -34,13 +33,14 @@ bool CCommandMove::Execute() {
     }
 
     if (!m_Game.IsInitialized()) {
-        m_Interface.GetIstream() >> bin;
+        getline(m_Interface.GetIstream(), bin);
         m_Interface.PromptMessage("Game is not initialized yet.\n");
         return true;
     }
+
     if (!m_Game.MakeTurn()) {
         m_Interface.PromptMessage("Game is over. Do you want to restart the game [y/N]: ");
-        getline(m_Interface.GetIstream(), line);
+        getline(m_Interface.GetIstream(), bin);
         getline(m_Interface.GetIstream(), line);
         if (m_Interface.GetIstream().fail())
             throw std::runtime_error("Error during reading input (loading).");

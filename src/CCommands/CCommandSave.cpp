@@ -11,15 +11,25 @@ CCommandSave::CCommandSave(const CInterface & interface, const char * help, CGam
 
 bool CCommandSave::Execute() {
     std::string bin;
+    std::string line;
     // If game is not initialized yet
     if (!m_Game.IsInitialized()) {
-        m_Interface.GetIstream() >> bin;
+        getline(m_Interface.GetIstream(), bin);
         m_Interface.PromptMessage("Game is not initialized yet.\n");
         return true;
     }
     std::string path;
     if (!(m_Interface.GetIstream() >> path))
         throw std::runtime_error("Error during inputting path for save file.");
+
+    getline(m_Interface.GetIstream(), line);
+    if (m_Interface.GetIstream().fail())
+        throw std::runtime_error("Error during reading input (saving).");
+
+    if (line != "") {
+        m_Interface.PromptMessage("Command 'save' has no options apart from the path to save file.\n");
+        return true;
+    }
 
     std::ofstream file;
 
@@ -34,6 +44,7 @@ bool CCommandSave::Execute() {
         m_Interface.PromptMessage("This path cannot be used for save file.\n");
         return true;
     }
+
 
     file.close();
     return true;

@@ -15,9 +15,17 @@ bool CCommandLoad::Execute() {
     if (!(m_Interface.GetIstream() >> path))
         throw std::runtime_error("Error during inputting path for save file.");
 
+    getline(m_Interface.GetIstream(), line);
+    if (m_Interface.GetIstream().fail())
+        throw std::runtime_error("Error during reading input (loading).");
+
+    if (line != "") {
+        m_Interface.PromptMessage("Command 'load' has no options apart from the path to save file.\n");
+        return true;
+    }
+
     if (m_Game.IsInitialized()) {
-        m_Interface.PromptMessage("Game is already initialized. Do you want to use overwrite current game [y/N]: ");
-        getline(m_Interface.GetIstream(), line);
+        m_Interface.PromptMessage("Game is already initialized. Do you want to overwrite current game [y/N]: ");
         getline(m_Interface.GetIstream(), line);
         if (m_Interface.GetIstream().fail())
             throw std::runtime_error("Error during reading input (loading).");

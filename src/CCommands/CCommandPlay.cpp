@@ -12,7 +12,7 @@ CCommandPlay::CCommandPlay(const CInterface & interface, const char * help, CGam
 bool CCommandPlay::Execute() {
     std::string bin;
     if (m_Game.IsInitialized()) {
-        m_Interface.GetIstream() >> bin;
+        getline(m_Interface.GetIstream(), bin);
         m_Interface.PromptMessage("Game is already initialized.\n");
         return true;
     }
@@ -26,13 +26,23 @@ bool CCommandPlay::Execute() {
     m_Interface.GetIstream() >> input;
     input.push_back(' ');
 
+    std::string line;
+    getline(m_Interface.GetIstream(), line);
+    if (m_Interface.GetIstream().fail())
+        throw std::runtime_error("Error during reading input (play).");
+
+    if (line != "") {
+        m_Interface.PromptMessage("Command 'play' has no options apart from play mode.\n");
+        return true;
+    }
+
     if (m_Interface.GetIstream().eof())
         return false;
     if (m_Interface.GetIstream().fail())
         throw std::runtime_error("Error during execution of command 'play'");
 
     if (sscanf(input.c_str()," %c%c%c", &white, &black, &difficulty) != 3) {
-        std::cout << input << std::endl;
+        m_Interface.GetIstream().ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         m_Interface.PromptMessage("Invalid format\n");
         return true;
     }

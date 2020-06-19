@@ -15,7 +15,7 @@ CApplication::CApplication(const CInterface &interface)
     m_Commands.emplace("save", std::make_unique<CCommandSave>(m_Interface, " [filename] : saves game to 'filename'", m_Game));
     m_Commands.emplace("load", std::make_unique<CCommandLoad>(m_Interface, " [filename] : loads 'filename'", m_Game));
     m_Commands.emplace("move", std::make_unique<CCommandMove>(CCommandMove(m_Interface,
-            " [a|b|c|d|e|f|g|h][1|2|3|4|5|6|7|8][a|b|c|d|e|f|g|h]][1|2|3|4|5|6|7|8]][q|r|b|n] : make a move - first two letters is the position of a piece to be move, following two letters is the position of the destination. If a pawn is going to promoted, a piece is needed for a pawn to promote to (q, r, b, n). (all must be lowercase) (example: move a1b2)", m_Game)));
+            " [a|b|c|d|e|f|g|h][1|2|3|4|5|6|7|8][a|b|c|d|e|f|g|h]][1|2|3|4|5|6|7|8]][q|r|b|n] : make a move - first two letters is the position of a piece to be move, following two letters is the position of the destination. If a pawn is going to promote, a piece is needed for a pawn to promote to (q, r, b, n). (all must be lowercase) (example: move a1b2)", m_Game)));
     m_Commands.emplace("board", std::make_unique<CCommandBoard>(CCommandBoard(m_Interface, " : shows the state of the chess board", m_Game)));
     m_Commands.emplace("help", std::make_unique<CCommandHelp>(CCommandHelp(m_Interface, " : shows commands used by this program", m_Commands)));
     m_Commands.emplace("quit", std::make_unique<CCommandQuit>(CCommandQuit(m_Interface, " : quits this program")));
@@ -28,8 +28,6 @@ int CApplication::Run() {
         });
         if (!m_Commands[command]->Execute())
             break;
-
-
     }
     return 0;
 }

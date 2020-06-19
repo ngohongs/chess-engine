@@ -12,13 +12,23 @@ CCommandRestart::CCommandRestart(const CInterface & interface, const char * help
 
 bool CCommandRestart::Execute() {
     std::string line;
+
+    getline(m_Interface.GetIstream(), line);
+    if (m_Interface.GetIstream().fail())
+        throw std::runtime_error("Error during reading input (restarting).");
+
+    if (line != "") {
+        m_Interface.PromptMessage("Command 'restart' has no options.\n");
+        return true;
+    }
+
     // If game is not initialized yet
     if (!m_Game.IsInitialized()) {
-        m_Interface.PromptMessage("Game is not initialzed yet, for help enter the command 'help'\n");
+        getline(m_Interface.GetIstream(), line);
+        m_Interface.PromptMessage("Game is not initialized yet, for help enter the command 'help'\n");
         return true;
     }
     m_Interface.PromptMessage("Do you want to restart the game? [y/N]: ");
-    getline(m_Interface.GetIstream(), line);
     getline(m_Interface.GetIstream(), line);
     if (m_Interface.GetIstream().fail())
         throw std::runtime_error("Error during reading input (loading).");

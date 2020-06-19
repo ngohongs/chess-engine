@@ -11,6 +11,15 @@ CCommandQuit::CCommandQuit(const CInterface & interface, const char * help)
 }
 
 bool CCommandQuit::Execute() {
+    std::string line;
+    getline(m_Interface.GetIstream(), line);
+    if (m_Interface.GetIstream().fail())
+        throw std::runtime_error("Error during reading input (quitting).");
+
+    if (line != "") {
+        m_Interface.PromptMessage("Command 'quit' has no options.\n");
+        return true;
+    }
     return false;
 }
 

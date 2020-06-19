@@ -11,9 +11,20 @@ CCommandHelp::CCommandHelp(const CInterface & interface, const char * help, std:
 }
 
 bool CCommandHelp::Execute() {
-    m_Interface.PromptMessage("Chess\nall black pieces are represented with lowercase letters (n stands for knight),\nall white piece are represented with uppercase letters (N stands for knight)\n\n");
+    std::string line;
+    getline(m_Interface.GetIstream(), line);
+    if (m_Interface.GetIstream().fail())
+        throw std::runtime_error("Error during reading input (help).");
+
+    if (line != "") {
+        m_Interface.PromptMessage("Command 'help' has no options.\n");
+        return true;
+    }
+
+    m_Interface.PromptMessage("\nChess\nall black pieces are represented with lowercase letters (n stands for knight),\nall white piece are represented with uppercase letters (N stands for knight)\n\n");
     for (const auto &i : m_Commands) {
         m_Interface.PromptMessage((i.first + i.second->GetHelp() + "\n"));
     }
+    m_Interface.PromptMessage("\n");
     return true;
 }

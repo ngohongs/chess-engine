@@ -964,6 +964,12 @@ std::istream & operator>>(std::istream & is, CBoard & board) {
         return is;
     }
     getline(is, line);
+
+    if (line != "") {
+            is.setstate(std::ios::failbit);
+            return is;
+    }
+
     getline(is, line);
     if (is.fail())
         return is;
