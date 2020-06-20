@@ -71,7 +71,7 @@ std::ostream & operator<<(std::ostream & os, const CHashKey & self) {
     // output every key to stream
     for (int i = 0; i < 12; i++) {
         for (int j = 0; j < 120; j++) {
-            os << self.m_PiecesKeys[i][j] << ' ' << key;
+            os << self.m_PiecesKeys[i][j] << ' ' << key << ' ';
             key ^= self.m_PiecesKeys[i][j];
             finalKey ^= self.m_PiecesKeys[i][j];
             sum += self.m_PiecesKeys[i][j];
@@ -82,7 +82,7 @@ std::ostream & operator<<(std::ostream & os, const CHashKey & self) {
 
     key = 0;
     for (int i = 0; i < 16; i++) {
-        os << self.m_CastlingKeys[i] << ' ' << key;
+        os << self.m_CastlingKeys[i] << ' ' << key << ' ';
         key ^= self.m_CastlingKeys[i];
         finalKey ^= self.m_CastlingKeys[i];
         sum += self.m_CastlingKeys[i];
@@ -91,7 +91,7 @@ std::ostream & operator<<(std::ostream & os, const CHashKey & self) {
 
     key = 0;
     for (int i = 0; i < 120; i++) {
-        os << self.m_EnPassantKey[i] << ' ' << key;
+        os << self.m_EnPassantKey[i] << ' ' << key << ' ';
         key ^= self.m_EnPassantKey[i];
         finalKey ^= self.m_EnPassantKey[i];
         sum += self.m_EnPassantKey[i];
