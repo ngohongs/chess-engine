@@ -71,7 +71,7 @@ std::ostream & operator<<(std::ostream & os, const CHashKey & self) {
     // output every key to stream
     for (int i = 0; i < 12; i++) {
         for (int j = 0; j < 120; j++) {
-            os << self.m_PiecesKeys[i][j] << ' ';
+            os << self.m_PiecesKeys[i][j] << ' ' << key;
             key ^= self.m_PiecesKeys[i][j];
             finalKey ^= self.m_PiecesKeys[i][j];
             sum += self.m_PiecesKeys[i][j];
@@ -82,7 +82,7 @@ std::ostream & operator<<(std::ostream & os, const CHashKey & self) {
 
     key = 0;
     for (int i = 0; i < 16; i++) {
-        os << self.m_CastlingKeys[i] << ' ';
+        os << self.m_CastlingKeys[i] << ' ' << key;
         key ^= self.m_CastlingKeys[i];
         finalKey ^= self.m_CastlingKeys[i];
         sum += self.m_CastlingKeys[i];
@@ -91,7 +91,7 @@ std::ostream & operator<<(std::ostream & os, const CHashKey & self) {
 
     key = 0;
     for (int i = 0; i < 120; i++) {
-        os << self.m_EnPassantKey[i] << ' ';
+        os << self.m_EnPassantKey[i] << ' ' << key;
         key ^= self.m_EnPassantKey[i];
         finalKey ^= self.m_EnPassantKey[i];
         sum += self.m_EnPassantKey[i];
@@ -123,8 +123,10 @@ std::istream & operator>>(std::istream & is, CHashKey & self) {
 
     for (int i = 0; i < 12; i++) {
         for (int j = 0; j < 120; j++) {
-            if (!(is >> self.m_PiecesKeys[i][j]))
+            if (!(is >> self.m_PiecesKeys[i][j] >> checkKey) || checkKey != key) {
+                is.setstate(std::ios::failbit);
                 return is;
+            }
             key ^= self.m_PiecesKeys[i][j];
             finalKey ^= self.m_PiecesKeys[i][j];
             sum += self.m_PiecesKeys[i][j];
@@ -142,8 +144,10 @@ std::istream & operator>>(std::istream & is, CHashKey & self) {
 
     key = 0;
     for (int i = 0; i < 16; i++) {
-        if(!(is >> self.m_CastlingKeys[i]))
+        if(!(is >> self.m_CastlingKeys[i] >> checkKey) || checkKey != key) {
+            is.setstate(std::ios::failbit);
             return is;
+        }
         key ^= self.m_CastlingKeys[i];
         finalKey ^= self.m_CastlingKeys[i];
         sum += self.m_CastlingKeys[i];
@@ -160,8 +164,10 @@ std::istream & operator>>(std::istream & is, CHashKey & self) {
 
     key = 0;
     for (int i = 0; i < 120; i++) {
-        if (!(is >> self.m_EnPassantKey[i]))
+        if (!(is >> self.m_EnPassantKey[i] >> checkKey) || checkKey != key) {
+            is.setstate(std::ios::failbit);
             return is;
+        }
         key ^= self.m_EnPassantKey[i];
         finalKey ^= self.m_EnPassantKey[i];
         sum += self.m_EnPassantKey[i];
