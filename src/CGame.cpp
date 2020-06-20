@@ -175,6 +175,18 @@ std::istream & operator>>(std::istream & is, CGame & self) {
         return is;
     }
 
+    if (self.m_Board.GetSide() == EColor::WHITE && self.m_White->IsComputer()) {
+        self.m_Initialized = false;
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
+    if (self.m_Board.GetSide() == EColor::BLACK && self.m_Black->IsComputer()) {
+        self.m_Initialized = false;
+        is.setstate(std::ios::failbit);
+        return is;
+    }
+
     self.m_Initialized = true;
     return is;
 }
