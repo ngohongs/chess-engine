@@ -935,7 +935,7 @@ std::ostream & operator<<(std::ostream & os, const CBoard & board) {
     for (const auto & i : board.m_HistoryKeys) {
         key ^= i.first ^ i.second;
         sum += i.first + i.second;
-        os << i.first << ":" << i.second << std::endl;
+        os << i.first << ':' << i.second << ':' << key << std::endl;
     }
 
     // key for checking when loadidng
@@ -1029,24 +1029,30 @@ std::istream & operator>>(std::istream & is, CBoard & board) {
 
     uint64_t tmpFirst;
     char c;
+    char c1;
     int tmpSecond;
+    uint64_t checkKey = 0;
+    uint64_t checkSum = 0;
 
     for (uint64_t i = 0; i < cnt; i++) {
-        if (!(is >> tmpFirst >> c >> tmpSecond))
+        if (!(is >> tmpFirst >> c >> tmpSecond >> c1 >> checkKey))
             return is;
 
-        if (c != ':') {
+        if (c != ':' || c1 != ':') {
             is.setstate(std::ios::failbit);
             return is;
         }
 
         key ^= tmpFirst ^ tmpSecond;
+
+        if (checkKey != key) {
+            is.setstate(std::ios::failbit);
+            return is;
+        }
+
         sum += tmpFirst + tmpSecond;
         board.m_HistoryKeys[tmpFirst] = tmpSecond;
     }
-
-    uint64_t checkKey = 0;
-    uint64_t checkSum = 0;
 
     if (!(is >> checkKey >> c >> checkSum))
         return is;
@@ -1061,6 +1067,7 @@ std::istream & operator>>(std::istream & is, CBoard & board) {
 }
 
 void CBoard::Restart() {
+    m_HashKeys = CHashKey();
     if (!ReadFEN(START_FEN))
         throw std::runtime_error("Error during restarting game.");
 }
