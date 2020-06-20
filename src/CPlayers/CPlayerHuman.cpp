@@ -42,7 +42,6 @@ bool CPlayerHuman::TakeTurn() {
         if (move == i) {
             if (!m_Board.MakeMove(i)) {
                 m_Interface.PromptMessage("Illegal move, your king will be in check.\n");
-                m_Interface.Clear();
                 return true;
             }
 

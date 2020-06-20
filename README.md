@@ -64,6 +64,6 @@ Celá aplikace bude řízena třídou `CApplication`, která se stará oběh hry
 
 ### Kde mám polymorfismus?
 
-Polymorfismus využívá třída `CPiece`, ta obsahuje abstraktní metodu `MoveSet`, která vrací množinu možných tahů. Jednotlivé šachové figurky `CKing`, `CQueen`, `CRook`, `CBishop`, `CKnight`, `CPawn` pak přetěžují tyto metody podle toho, jak se chovají.
+Polymorfismus využívá třída `CPiece`, ta obsahuje abstraktní metodu `MoveList`, která vrací seznam možných tahů. Jednotlivé šachové figurky `CKing`, `CQueen`, `CRook`, `CBishop`, `CKnight`, `CPawn` pak přetěžují tyto metody podle toho, jak se chovají.
 
-Dále polymorfismu využívá třída `CPlayer`, která obsahuje abstraktní metodu `GetMove`. V případě, že se jedná o lokálního hráče, zeptá se uživatele na další tah. U počítače, který má nastavenou obtížnost na nejlehčí, tak vrátí náhodný tah. U středně těžkého a těžkého počítače bude metoda vracet tah, který budu založen na algoritmu Minimax, který má podle obtížnosti nastavenou hloubku hledaní.
+Dále polymorfismu využívá třída `CPlayer`, která obsahuje abstraktní metodu `TakeTurn`. V případě, že se jedná o lokálního hráče, zeptá se uživatele na další tah. U počítače podle obtížnosti od 1 až do 5 vyhledá nejlepší tah. Hodnota tahu je určena podle stavu desky, obtížnost určuje hloubku hledaní algoritmu MiniMax (resp. NegaMax). Rychlost programu je však omezena tímto hledání, neboť musí program projít všechny možnosti do určené hloubky.
