@@ -1,6 +1,6 @@
 # Chess
 
-https://user-images.githubusercontent.com/56195457/121943573-03d16900-cd52-11eb-96d3-69a614caa7be.mp4
+https://user-images.githubusercontent.com/56195457/121944122-94a84480-cd52-11eb-8c52-7112ab517e22.mp4
 
 Chess follows all the rules of classic chess game (Castling, En Passant move etc.)
 
