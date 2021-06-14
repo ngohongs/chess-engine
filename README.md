@@ -2,7 +2,7 @@
 
 https://user-images.githubusercontent.com/56195457/121944122-94a84480-cd52-11eb-8c52-7112ab517e22.mp4
 
-Chess follows all the rules of classic chess game (Castling, En Passant move etc.)
+Chess follows all the rules of classic chess game (Castling, En Passant move etc.) AI is implemented with Alpha Beta pruning. Difficulty of the AI sets the depth of MinMax search.
 
 ## Run
 
