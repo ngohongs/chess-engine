@@ -1,5 +1,7 @@
 # Chess
 
+https://user-images.githubusercontent.com/56195457/121943573-03d16900-cd52-11eb-96d3-69a614caa7be.mp4
+
 Chess follows all the rules of classic chess game (Castling, En Passant move etc.)
 
 ## Run
@@ -19,7 +21,9 @@ All commands are case sensitive.
 - `help` shows help
 - `quit` quits the game
 
+White pieces are in capital letters whereas black pieces are in lower letters.
 
+Example of CLI of the game chess:
 ```
 Enter a command, for help enter the command 'help':
 $ board
